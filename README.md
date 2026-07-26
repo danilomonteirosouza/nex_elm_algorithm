@@ -1,4 +1,4 @@
-# NEX-ELM v68 — GloPro-Complete
+# NEX-ELM
 
 Implementação reprodutível do **NEX-ELM**, uma técnica de explicabilidade glocal e específica para ensembles de **Extreme Learning Machines (ELMs)**. O algoritmo combina explicações locais baseadas em trajetórias intervencionais com uma biblioteca finita de protótipos explicativos condicionados à classe prevista.
 
