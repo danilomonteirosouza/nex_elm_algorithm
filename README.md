@@ -5,7 +5,7 @@ Reproducible implementation of **NEX-ELM**, a model-specific glocal explainabili
 The main executable file is:
 
 ```text
-nexlm_v68_journal_complete_datasets.py
+nexlm
 ```
 
 Running the script without command-line arguments reproduces the complete experimental protocol reported in the associated manuscript: **9 dataset configurations × 30 independent random seeds = 270 primary experimental runs**. The default workflow uses CUDA and generates predictive evaluations, local and global explanation analyses, CPU–GPU numerical audits, confirmatory statistical tests, consolidated tables, and a PDF report.
