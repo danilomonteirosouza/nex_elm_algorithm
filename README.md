@@ -13,7 +13,7 @@ NEX-ELM combines:
 The main executable file is:
 
 ```text
-nexlm_v69_expanded_xai_benchmarks.py
+nexlm.py
 ```
 
 Running the script without command-line arguments executes the complete CUDA study plan reported for v69:
