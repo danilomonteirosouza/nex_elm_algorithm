@@ -1,21 +1,3 @@
-"""NEX-ELM v68 - GloPro-Complete: Frozen-Math Replication and Generalization Suite.
-
-Active method
--------------
-A finite class-conditional library of registered-set prototype explanations is
-learned only from calibration data. At inference, each local signature is routed
-to a fixed class-conditional prototype; the reported representation is therefore
-glocal and prototype-conditioned. NEX and Kernel SHAP receive the same fixed
-prototype budget and registered-set routing rule. The outer test does not learn
-prototypes, select prototype count, or use labels/fidelity for routing.
-
-Integrity-checked mathematical core
------------------------------------
-The ELM estimator, local IRP-NEX explanations, NEX-S/NEX-P, CUDA executor,
-CUDA audit, and external insertion/deletion evaluator are loaded unchanged
-from an integrity-checked engine embedded in this standalone file. An adjacent
-engine is optional and is used only when its SHA-256 matches exactly.
-"""
 from __future__ import annotations
 
 import argparse
@@ -46,22 +28,26 @@ import pandas as pd
 from scipy import stats
 from scipy.optimize import linear_sum_assignment
 
-VERSION = "v68"
-PACKAGING_REVISION = "v68-glopro-complete-frozen-math-full-benchmark-report"
-SOLVER_ID = "nex_glopro_complete"
+VERSION = "v70"
+PACKAGING_REVISION = "v70-expanded-xai-benchmarks-eight-datasets"
+SOLVER_ID = "nex_glopro_complete_v70_benchmark"
 METHOD_DEFINITION = (
     "glocal_prototype_conditioned_class_conditional_registered_set_library_with_"
-    "deterministic_kmedoids_and_capacity_matched_nex_shap_routing"
+    "deterministic_kmedoids_capacity_matched_nex_shap_routing_with_external_local_global_glocal_baselines"
 )
 GLOBAL_REPRESENTATION = "glocal/prototype-conditioned"
 GLOBAL_REPRESENTATION_DEFINITION = (
-    "glocal/prototype-conditioned class-conditional registered-set prototype library"
+    "glocal/prototype-conditioned class-conditional registered-set prototype library; external baselines do not alter NEX mathematics"
 )
 PROTOTYPE_COUNT = 4
-# This is a prototype-budget cap: K_eff <= floor(n_calibration / value).
-# It is not a post-k-medoids minimum cluster-size constraint.
+
+
 MIN_CALIBRATION_ROWS_PER_PROTOTYPE_SLOT = 2
-ENGINE_FILENAME = "nexlm_v68_glopro_complete_core.py"
+EXPANDED_LOCAL_METHODS = ("NEX-ELM", "Kernel SHAP", "LIME", "Integrated Gradients", "Gradient SHAP")
+EXPANDED_GLOBAL_METHODS = ("NEX-ELM", "Kernel SHAP", "X-ELM", "Permutation Importance", "SAGE")
+EXPANDED_GLOCAL_METHODS = ("NEX-ELM", "R-LOCO")
+RLOCO_REFERENCE = "Regional Explanations: Bridging Local and Global Variable Importance, NeurIPS 2025"
+ENGINE_FILENAME = "nexlm_glopro_complete_core.py"
 EXPECTED_ENGINE_SHA256 = "fc78619795db892180c7b978366a67b15a48741103f0fcc98eeab7b7dcf2031f"
 _EMBEDDED_ENGINE_B85 = (
     'c-ri}%aR*Mk|?^bugJ-^9s*JVtSXXfsU+xjiK1Gxp(vV2HQ5&jH#-3&s!|0YF_}P-MNXN`58Tz94>&VtajX}!8atb_xeNZue984kJUk*J0Tdsa9<z~kvyhn)'
@@ -3044,7 +3030,7 @@ _ROUTING_CLOCK: Dict[Tuple[str, str], Dict[str, Any]] = {}
 _CURRENT_ROUTING_KEY: Optional[Tuple[str, str]] = None
 
 METHOD_NAME = "GloPro-Complete"
-METHOD_TITLE = "NEX-ELM v68 - GloPro-Complete"
+METHOD_TITLE = "NEX-ELM v70 - Expanded Local/Global/Glocal Benchmark"
 STATISTICAL_SUITE = "paired parametric, paired nonparametric, omnibus, rank-based post-hoc, and exact win-rate inference"
 ARTICLE_METHODS_GLOBAL = ("NEX-ELM", "Kernel SHAP", "X-ELM")
 ARTICLE_METHODS_LOCAL = ("NEX-ELM", "Kernel SHAP", "Random")
@@ -3056,9 +3042,9 @@ ARTICLE_METHODS_TIMING_WORKFLOW = (
 GRAPH_FORMATS = ("png", "pdf", "svg")
 DIAGNOSTIC_GRAPH_FORMATS = ("png", "pdf")
 
-# Journal-facing validation protocol. These settings affect only which frozen
-# experiments are run and how they are labelled; they do not enter the NEX-ELM
-# estimator, attributions, prototype learning, distance, k-medoids, or routing.
+
+
+
 PREVIOUS_CONFIRMATORY_SEED_START = 50000
 PREVIOUS_CONFIRMATORY_REPEATS = 30
 REPLICATION_SEED_START = 100000
@@ -3077,7 +3063,6 @@ GENERALIZATION_DATASETS = (
 )
 EXTENDED_GENERALIZATION_DATASETS = (
     "iris_multiclass",
-    "digits_multiclass",
     "breast_cancer_diagnostic",
 )
 OPTIONAL_DATASETS = EXTENDED_GENERALIZATION_DATASETS
@@ -3094,7 +3079,6 @@ DATASET_ALIASES = {
     "ionosphere": "ionosphere_binary",
     "wine": "wine_multiclass",
     "iris": "iris_multiclass",
-    "digits": "digits_multiclass",
     "breast_diagnostic": "breast_cancer_diagnostic",
 }
 _STUDY_CONTEXT: Dict[Tuple[str, str], Dict[str, Any]] = {}
@@ -3134,7 +3118,7 @@ def _resolve_engine_path() -> Tuple[Path, str]:
         )
 
     raw = _embedded_engine_bytes()
-    cache_dir = Path(tempfile.gettempdir()) / "nexelm_v68_glopro_complete_core"
+    cache_dir = Path(tempfile.gettempdir()) / "nexelm_v70_expanded_xai_core"
     cache_dir.mkdir(parents=True, exist_ok=True)
     cached = cache_dir / f"nexelm_glopro_stat_core_{EXPECTED_ENGINE_SHA256[:16]}.py"
     if not cached.exists() or _sha256(cached) != EXPECTED_ENGINE_SHA256:
@@ -3239,7 +3223,7 @@ def _load_engine() -> Any:
 
 engine = _load_engine()
 
-# Stable public bindings and dynamically resolved integrity-checked core functions.
+
 _ENGINE_PARSE_ARGS = engine.parse_args
 _ENGINE_APPLY_PROTOCOL = engine.apply_protocol
 _ENGINE_POSTPROCESS = _latest_function(
@@ -3281,13 +3265,16 @@ _ENGINE_SPLIT_OUTER_AND_CALIBRATION = _latest_function(
 _ENGINE_BUILD_ENSEMBLE = _latest_function(
     engine, parameters=("args", "runtime", "X_train", "y_train", "seed")
 )
+_ENGINE_BACKGROUND_POOLS = _latest_function(
+    engine, parameters=("fit_X", "fit_y", "requested", "seed", "eval_fraction"), name_suffix="background_pools"
+)
 _ENGINE_SELF_TESTS = _latest_function(engine, name_suffix="_self_tests")
 _LOCAL_ORDER_CACHE = _latest_value_by_suffix(engine, "LOCAL_ORDER_CACHE")
 _ROUTING_DIAGNOSTICS = _latest_value_by_suffix(engine, "ROUTING_DIAGNOSTICS")
 
 
 def _set_internal_prototype_bridge(args: argparse.Namespace) -> None:
-    """Keep the integrity-checked core on the frozen K=4 and capacity-cap=2 settings."""
+
     for key in list(vars(args)):
         lower = str(key).lower()
         if lower.endswith("_prototypes"):
@@ -3341,7 +3328,7 @@ def _extract_clean_cli(argv: Sequence[str]) -> Tuple[argparse.Namespace, List[st
         choices=("complete", "journal", "replication", "generalization", "custom"),
         default="complete",
         help=(
-            "complete runs all nine available real-data scenarios with 30 repetitions by default; "
+            "complete runs all eight available real-data scenarios with 30 repetitions by default; "
             "journal retains the six-scenario preceding plan; custom preserves --datasets/--n-repeats."
         ),
     )
@@ -3369,6 +3356,20 @@ def _extract_clean_cli(argv: Sequence[str]) -> Tuple[argparse.Namespace, List[st
         default="",
         help="Additional datasets for journal/generalization plans. The complete plan already includes all available datasets.",
     )
+    parser.add_argument(
+        "--expanded-baselines",
+        choices=("full", "fast", "off"),
+        default="full",
+        help="Run the v70 local, global, and glocal comparator suite. fast reduces Monte Carlo budgets; off keeps only the core benchmark.",
+    )
+    parser.add_argument("--lime-samples", type=int, default=512)
+    parser.add_argument("--integrated-gradients-nodes", type=int, default=32)
+    parser.add_argument("--gradient-shap-samples", type=int, default=64)
+    parser.add_argument("--permutation-importance-repeats", type=int, default=8)
+    parser.add_argument("--sage-permutations", type=int, default=64)
+    parser.add_argument("--sage-evaluation-rows", type=int, default=128)
+    parser.add_argument("--rloco-regions", type=int, default=4)
+    parser.add_argument("--rloco-max-features", type=int, default=0, help="0 means all features; positive values are an explicit audit-only cap.")
     values, remaining = parser.parse_known_args(list(argv))
     values.raw_remaining_cli = tuple(remaining)
     if int(values.prototype_count) != PROTOTYPE_COUNT:
@@ -3397,7 +3398,7 @@ Default Play execution (no parameters):
   device=cuda
   gpu_profile=rtx3060_12gb
   repetitions=30 per dataset
-  datasets=all nine available scenarios
+  datasets=all eight available scenarios
   output includes relatorio.pdf
 
 Complete datasets (default):
@@ -3408,7 +3409,6 @@ Complete datasets (default):
   ionosphere_binary
   wine_multiclass
   iris_multiclass
-  digits_multiclass
   breast_cancer_diagnostic
 
 Main options:
@@ -3424,6 +3424,18 @@ Main options:
   --no-download
   --gpu-audit / --no-gpu-audit
   --skip-pdf-report
+
+Expanded v70 comparators:
+  local: Kernel SHAP, LIME, Integrated Gradients, Gradient SHAP
+  global: Kernel SHAP, X-ELM, Permutation Importance, SAGE
+  glocal: R-LOCO
+  --expanded-baselines {{full,fast,off}}
+  --lime-samples INTEGER
+  --integrated-gradients-nodes INTEGER
+  --gradient-shap-samples INTEGER
+  --permutation-importance-repeats INTEGER
+  --sage-permutations INTEGER
+  --rloco-regions INTEGER
 
 Custom plan:
   --datasets CSV
@@ -3474,7 +3486,7 @@ def parse_args() -> argparse.Namespace:
         args = _ENGINE_PARSE_ARGS()
     finally:
         sys.argv = original
-    # No-parameter execution is intentionally the full CUDA experiment.
+
     if not _cli_option_present(remaining, "--mode"):
         args.mode = "real"
     if not _cli_option_present(remaining, "--device"):
@@ -3486,7 +3498,7 @@ def parse_args() -> argparse.Namespace:
     if not _cli_option_present(remaining, "--gpu-audit") and not _cli_option_present(remaining, "--no-gpu-audit"):
         args.gpu_audit = True
     stamp = time.strftime("%Y%m%d_%H%M%S")
-    args.batch_run_id = f"v68_glopro_complete_{stamp}_{int(args.random_state)}"
+    args.batch_run_id = f"v70_expanded_xai_{stamp}_{int(args.random_state)}"
     args.run_id = args.batch_run_id
     args.prototype_count = PROTOTYPE_COUNT
     args.prototype_min_calibration_rows_per_slot = MIN_CALIBRATION_ROWS_PER_PROTOTYPE_SLOT
@@ -3509,9 +3521,25 @@ def parse_args() -> argparse.Namespace:
     args.previous_confirmatory_repeats = max(1, int(clean.previous_confirmatory_repeats))
     args.allow_seed_overlap = bool(clean.allow_seed_overlap)
     args.include_optional_datasets = str(clean.include_optional_datasets)
+    args.expanded_baselines = str(clean.expanded_baselines)
+    args.lime_samples = max(64, int(clean.lime_samples))
+    args.integrated_gradients_nodes = max(8, int(clean.integrated_gradients_nodes))
+    args.gradient_shap_samples = max(8, int(clean.gradient_shap_samples))
+    args.permutation_importance_repeats = max(1, int(clean.permutation_importance_repeats))
+    args.sage_permutations = max(4, int(clean.sage_permutations))
+    args.sage_evaluation_rows = max(16, int(clean.sage_evaluation_rows))
+    args.rloco_regions = max(2, int(clean.rloco_regions))
+    args.rloco_max_features = max(0, int(clean.rloco_max_features))
+    if bool(getattr(args, "quick", False)) or args.expanded_baselines == "fast":
+        args.lime_samples = min(args.lime_samples, 128)
+        args.integrated_gradients_nodes = min(args.integrated_gradients_nodes, 16)
+        args.gradient_shap_samples = min(args.gradient_shap_samples, 24)
+        args.permutation_importance_repeats = min(args.permutation_importance_repeats, 3)
+        args.sage_permutations = min(args.sage_permutations, 12)
+        args.sage_evaluation_rows = min(args.sage_evaluation_rows, 64)
     if args.study_plan != "custom":
         base_state = args.replication_random_state if args.study_plan in {"complete", "journal", "replication"} else args.generalization_random_state
-        args.batch_run_id = f"v68_glopro_complete_{args.study_plan}_{stamp}_{base_state}"
+        args.batch_run_id = f"v70_expanded_xai_{args.study_plan}_{stamp}_{base_state}"
         args.run_id = args.batch_run_id
     _set_internal_prototype_bridge(args)
     return args
@@ -3526,6 +3554,9 @@ def apply_protocol(args: argparse.Namespace) -> argparse.Namespace:
             "generalization_repeats", "generalization_random_state", "generalization_datasets",
             "previous_confirmatory_seed_start", "previous_confirmatory_repeats",
             "allow_seed_overlap", "include_optional_datasets",
+            "expanded_baselines", "lime_samples", "integrated_gradients_nodes",
+            "gradient_shap_samples", "permutation_importance_repeats",
+            "sage_permutations", "sage_evaluation_rows", "rloco_regions", "rloco_max_features",
         )
     }
     args = _ENGINE_APPLY_PROTOCOL(args)
@@ -3588,14 +3619,14 @@ def _sanitize_text_value(value: Any) -> Any:
         return value
     text = value
     substitutions = [
-        (r"(?<![A-Za-z0-9])v(?:2[0-9]|3[0-9]|4[0-9]|5[0-9]|6[0-7])(?:\.\d+)*(?=$|[^A-Za-z0-9])", VERSION),
+        (r"(?<![A-Za-z0-9])v(?!70(?:\D|$))\d+(?:\.\d+)*(?=$|[^A-Za-z0-9])", VERSION),
         (r"SHAP-teacher budget", "capacity-matched Kernel SHAP reference budget"),
         (r"SHAP/X-ELM are not teachers for selection", "Kernel SHAP and X-ELM do not guide prototype learning"),
         (r"real_candidate_native_path_integral_no_teachers", "diagnostic_interaction_audit_not_used_for_prototype_learning"),
-        (r"v\d+(?:[._]\d+)*_default_\d+", "engine_default_not_used_by_v68_study_plan"),
+        (r"v\d+(?:[._]\d+)*_default_\d+", "engine_default_not_used_by_active_study_plan"),
         (
-            r"v68 preserves the CUDA guard inherited from v68(?:/v68)+\. Only global candidate generation and selection are changed\.",
-            "Frozen CUDA executor and CPU/CUDA numerical audit; no mathematical changes in v68.",
+            r"preserves the CUDA guard inherited from an earlier core(?:/earlier core)+\. Only global candidate generation and selection are changed\.",
+            "Frozen CUDA executor and CPU/CUDA numerical audit; no mathematical changes in the frozen mathematical core.",
         ),
     ]
     for pattern, replacement in substitutions:
@@ -3841,7 +3872,7 @@ def _timed_obtain_local_orders(
     context: Mapping[str, Any],
     seed: int,
 ):
-    """Generate the same frozen NEX and Kernel SHAP orders with separate clocks."""
+
     feature_count = int(X.shape[1])
     key = (str(dataset), str(scenario))
     clock = _ROUTING_CLOCK.setdefault(key, {})
@@ -3966,7 +3997,7 @@ def _ranked_fidelity_with_routing_audit(
     return result
 
 
-# Timing wrappers only. Mathematical outputs are delegated to the unchanged core.
+
 _replace_bindings(engine, _ENGINE_OBTAIN_LOCAL_ORDERS, _timed_obtain_local_orders)
 _replace_bindings(engine, _ENGINE_ROUTE_ORDERS, _timed_route_orders)
 _replace_bindings(engine, _ENGINE_RANKED_FIDELITY, _ranked_fidelity_with_routing_audit)
@@ -4101,7 +4132,7 @@ def postprocess_artifacts(
         "packaging_revision": PACKAGING_REVISION,
         "mathematical_core_source": _ENGINE_SOURCE,
         "prototype_min_calibration_rows_per_slot_fixed": MIN_CALIBRATION_ROWS_PER_PROTOTYPE_SLOT,
-        "primary_comparison": "NEX-ELM GloPro-Complete versus capacity-matched Kernel SHAP prototype library",
+        "primary_comparison": "separate local, global, and glocal comparisons; R-LOCO is the glocal baseline",
         "outer_test_used_for_prototype_learning": False,
         "test_labels_used_for_routing": False,
         "test_fidelity_used_for_routing": False,
@@ -4119,7 +4150,7 @@ def postprocess_artifacts(
         "isolated_xelm_speed_superiority_claimed": False,
         "wisconsin_reporting_policy": "report the replication result irrespective of direction or threshold attainment",
     }
-    engine.write_json(manifest, dataset_dir / "manifest_v68_glopro_complete.json")
+    engine.write_json(manifest, dataset_dir / "manifest_v70_expanded_xai.json")
     engine.write_json(manifest, dataset_dir / "manifest.json")
     return result
 
@@ -4145,7 +4176,13 @@ def confirmatory_plan(args: argparse.Namespace) -> pd.DataFrame:
         "per_cluster_minimum_enforced": False,
         "timing_audit": "NEX-ELM and Kernel SHAP signature/routing times are separate and included in each complete workflow",
         "routing": "prototype-conditioned glocal routing to the nearest fixed prototype",
-        "primary_global_comparison": "NEX-ELM GloPro-Complete versus capacity-matched Kernel SHAP prototype library",
+        "primary_global_comparison": "NEX-ELM versus Kernel SHAP, X-ELM, Permutation Importance, and SAGE",
+        "primary_local_comparison": "NEX-ELM versus Kernel SHAP, LIME, Integrated Gradients, and Gradient SHAP",
+        "primary_glocal_comparison": "NEX-ELM versus R-LOCO",
+        "expanded_local_methods": json.dumps(EXPANDED_LOCAL_METHODS, ensure_ascii=False),
+        "expanded_global_methods": json.dumps(EXPANDED_GLOBAL_METHODS, ensure_ascii=False),
+        "expanded_glocal_methods": json.dumps(EXPANDED_GLOCAL_METHODS, ensure_ascii=False),
+        "nex_mathematical_core_modified_for_baselines": False,
         "single_order_audits": "NEX-ELM-Single; Kernel SHAP-Single",
         "outer_test_used_for_prototype_learning": False,
         "test_labels_used_for_routing": False,
@@ -4185,9 +4222,9 @@ def _public_configuration(args: argparse.Namespace) -> Dict[str, Any]:
         "IRP-NEX local explanation core with calibration-only selection and external-test evaluation"
     )
     configuration["cuda_execution_definition"] = (
-        "Frozen CUDA executor with CPU/CUDA numerical audit; no mathematical changes in v68"
+        "Frozen CUDA executor with CPU/CUDA numerical audit; no mathematical changes in the frozen mathematical core"
     )
-    configuration["repetition_source"] = "v68 preregistered study-phase configuration"
+    configuration["repetition_source"] = "v70 expanded benchmark study-phase configuration"
     configuration["method_name"] = METHOD_NAME
     configuration["statistical_suite"] = STATISTICAL_SUITE
     for key in (
@@ -4202,6 +4239,10 @@ def _public_configuration(args: argparse.Namespace) -> Dict[str, Any]:
     configuration["evaluation_results_used_for_method_modification"] = False
     configuration["primary_claim"] = "fidelity and explanatory granularity over X-ELM"
     configuration["isolated_xelm_speed_superiority_claimed"] = False
+    configuration["expanded_local_methods"] = list(EXPANDED_LOCAL_METHODS)
+    configuration["expanded_global_methods"] = list(EXPANDED_GLOBAL_METHODS)
+    configuration["expanded_glocal_methods"] = list(EXPANDED_GLOCAL_METHODS)
+    configuration["nex_mathematical_core_modified_for_baselines"] = False
     return configuration
 
 
@@ -4281,11 +4322,23 @@ def _holm_adjust(values: Sequence[float]) -> np.ndarray:
 def _analysis_methods(scope: str, metric: str, available: Sequence[str]) -> List[str]:
     available_set = set(map(str, available))
     if scope == "global_fidelity":
-        preferred = ARTICLE_METHODS_GLOBAL
+        preferred = EXPANDED_GLOBAL_METHODS
     elif scope == "local_fidelity":
-        preferred = ARTICLE_METHODS_LOCAL
+        preferred = EXPANDED_LOCAL_METHODS
+    elif scope == "glocal_fidelity":
+        preferred = EXPANDED_GLOCAL_METHODS
     elif scope == "timing" and metric == "local":
-        preferred = ARTICLE_METHODS_TIMING_LOCAL
+        preferred = (
+            "NEX-ELM local per instance", "Kernel SHAP local per instance",
+            "LIME local per instance", "Integrated Gradients local per instance",
+            "Gradient SHAP local per instance",
+        )
+    elif scope == "timing" and metric == "global":
+        preferred = (
+            "Permutation Importance global complete", "SAGE global complete",
+        )
+    elif scope == "timing" and metric == "glocal":
+        preferred = ("R-LOCO glocal complete",)
     elif scope == "timing" and metric == "workflow":
         preferred = ARTICLE_METHODS_TIMING_WORKFLOW
     else:
@@ -4576,14 +4629,14 @@ def _friedman_and_nemenyi(
 
 
 def _binomial_win_tests(seed_metrics: pd.DataFrame, alpha: float) -> pd.DataFrame:
-    """Exact paired win-rate analysis across seeds.
 
-    Ties remain in the denominator and count as non-wins. The reported
-    Clopper-Pearson interval is two-sided with confidence level 1-alpha.
-    Three directional exact-binomial tests are kept in distinct families:
-    superiority over chance (p > 0.50), evidence below the preregistered
-    threshold (p < 0.80), and evidence above that threshold (p > 0.80).
-    """
+
+
+
+
+
+
+
     rows: List[Dict[str, Any]] = []
     tolerance = 1e-12
     confidence_level = 1.0 - float(alpha)
@@ -5096,14 +5149,14 @@ def _audit_generated_text(root: Path) -> pd.DataFrame:
 
     patterns = {
         "obsolete_version_reference": re.compile(
-            r"(?<![A-Za-z0-9])v(?:2[0-9]|3[0-9]|4[0-9]|5[0-9]|6[0-7])(?:\.\d+)*(?=$|[^A-Za-z0-9])", re.I
+            r"(?<![A-Za-z0-9])v(?!70(?:\D|$))\d+(?:\.\d+)*(?=$|[^A-Za-z0-9])", re.I
         ),
         "obsolete_method_code_1": re.compile(rf"\b{re.escape(token(80, 71, 65))}\b", re.I),
         "obsolete_method_code_2": re.compile(rf"\b{re.escape(token(71, 80, 73))}\b", re.I),
         "obsolete_method_code_3": re.compile(re.escape(token(72, 69, 83, 80, 79)), re.I),
         "obsolete_method_code_4": re.compile(rf"\b{re.escape(token(78, 69, 88, 45, 68, 73))}\b", re.I),
-        "obsolete_repetition_source": re.compile(r"engine_default_not_used_by_v68_study_plan|v\d+_default_\d+", re.I),
-        "malformed_cuda_history": re.compile(r"inherited from v68(?:/v68)+", re.I),
+        "obsolete_repetition_source": re.compile(r"engine_default_not_used_by_active_study_plan|v\d+_default_\d+", re.I),
+        "malformed_cuda_history": re.compile(r"inherited from an earlier core(?:/earlier core)+", re.I),
     }
     rows: List[Dict[str, Any]] = []
     for path in root.rglob("*"):
@@ -5140,6 +5193,42 @@ def _audit_generated_text(root: Path) -> pd.DataFrame:
     return pd.DataFrame(rows, columns=["file", "issue", "matches_json"])
 
 
+def _v70_consolidate_baseline_tables(combined: Path, args: argparse.Namespace) -> None:
+
+    combined = Path(combined)
+    specifications = (
+        ("local", EXPANDED_LOCAL_METHODS),
+        ("global", EXPANDED_GLOBAL_METHODS),
+    )
+    for prefix, allowed_methods in specifications:
+        for suffix in ("fidelity_detail", "fidelity_summary"):
+            frozen = _read_table(combined / f"{prefix}_{suffix}.csv")
+            external = _read_table(combined / f"{prefix}_baseline_{suffix}.csv")
+            frames = [frame for frame in (frozen, external) if isinstance(frame, pd.DataFrame) and not frame.empty]
+            if not frames:
+                continue
+            merged = pd.concat(frames, ignore_index=True, sort=False)
+            if "method" in merged:
+                merged = merged[merged["method"].astype(str).isin(set(allowed_methods))].copy()
+            merged = merged.drop_duplicates().reset_index(drop=True)
+            merged = _clean_frame(merged, args=args)
+            engine.write_csv(merged, combined / f"{prefix}_baseline_{suffix}.csv")
+
+    frozen_importance = _read_table(combined / "global_importance.csv")
+    external_importance = _read_table(combined / "global_baseline_importance.csv")
+    if not frozen_importance.empty and not external_importance.empty:
+        join_keys = [key for key in ("dataset", "scenario", "seed", "feature") if key in frozen_importance and key in external_importance]
+        frozen_values = [
+            column for column in ("xelm_global", "kernel_shap_global", "nexelm_global")
+            if column in frozen_importance
+        ]
+        if join_keys and frozen_values:
+            compact = frozen_importance[join_keys + frozen_values].drop_duplicates(subset=join_keys)
+            consolidated = external_importance.merge(compact, on=join_keys, how="left", validate="many_to_one")
+            consolidated = _clean_frame(consolidated, args=args)
+            engine.write_csv(consolidated, combined / "global_baseline_importance.csv")
+
+
 def aggregate_results(results: Sequence[Dict[str, Any]], output_root: Path, args: argparse.Namespace, runtime: Any) -> None:
     _ENGINE_AGGREGATE(results, output_root, args, runtime)
     output_root = Path(output_root)
@@ -5149,11 +5238,20 @@ def aggregate_results(results: Sequence[Dict[str, Any]], output_root: Path, args
     keys = [
         "prototype_library", "prototype_library_class_summary", "prototype_routing",
         "prototype_usage_summary", "prototype_routing_summary",
+        "local_baseline_attributions", "local_baseline_fidelity_detail", "local_baseline_fidelity_summary",
+        "local_baseline_completeness", "global_baseline_importance", "global_baseline_class_importance",
+        "global_baseline_fidelity_detail", "global_baseline_fidelity_summary",
+        "permutation_importance_diagnostics", "sage_diagnostics",
+        "glocal_baseline_fidelity_detail", "glocal_baseline_fidelity_summary",
+        "rloco_region_summary", "rloco_region_importance", "rloco_assignments",
+        "rloco_consistency_diagnostics", "rloco_reduced_model_fits", "expanded_baseline_timing",
     ]
     for key in keys:
         frames = [item.get(key) for item in results]
         frames = [frame for frame in frames if isinstance(frame, pd.DataFrame) and not frame.empty]
         engine.write_csv(pd.concat(frames, ignore_index=True) if frames else pd.DataFrame(), combined / f"{key}.csv")
+
+    _v70_consolidate_baseline_tables(combined, args)
 
     predictive_outputs = _aggregate_predictive_outputs(results, combined, args)
     _generate_predictive_figures(combined, predictive_outputs)
@@ -5162,6 +5260,8 @@ def aggregate_results(results: Sequence[Dict[str, Any]], output_root: Path, args
     engine.write_csv(stability, combined / "prototype_stability_between_seeds.csv")
     engine.write_csv(confirmatory_plan(args), combined / "plano_confirmatorio.csv")
     _clean_combined_csvs(combined, args)
+    _v70_append_seed_metrics(combined, results, args)
+    _v70_generate_expanded_baseline_figures(combined)
     statistical_outputs = _write_statistical_suite(combined, args)
     _clean_combined_csvs(combined, args)
 
@@ -5171,6 +5271,11 @@ def aggregate_results(results: Sequence[Dict[str, Any]], output_root: Path, args
         combined / "prototype_usage_summary.csv",
         combined / "prototype_routing_summary.csv",
         combined / "prototype_stability_between_seeds.csv",
+        combined / "local_baseline_fidelity_summary.csv",
+        combined / "global_baseline_fidelity_summary.csv",
+        combined / "glocal_baseline_fidelity_summary.csv",
+        combined / "rloco_region_summary.csv",
+        combined / "expanded_baseline_timing.csv",
         combined / "paired_t_tests.csv",
         combined / "shapiro_wilk_tests.csv",
         combined / "repeated_measures_anova.csv",
@@ -5189,6 +5294,12 @@ def aggregate_results(results: Sequence[Dict[str, Any]], output_root: Path, args
         combined / "predictive_class_metrics_summary.csv",
         combined / "predictive_dataset_summary.csv",
     ]
+    if str(getattr(args, "expanded_baselines", "full")) == "off":
+        expanded_names = {
+            "local_baseline_fidelity_summary.csv", "global_baseline_fidelity_summary.csv",
+            "glocal_baseline_fidelity_summary.csv", "rloco_region_summary.csv", "expanded_baseline_timing.csv",
+        }
+        required = [path for path in required if path.name not in expanded_names]
     missing = [str(path) for path in required if not path.exists() or path.stat().st_size <= 3]
     if missing:
         raise RuntimeError(f"{METHOD_TITLE} combined audit failed; required files missing or empty: {missing}")
@@ -5216,6 +5327,12 @@ def aggregate_results(results: Sequence[Dict[str, Any]], output_root: Path, args
         "workflow_includes_glocal_inference": True,
         "supplementary_statistical_suite_generated": True,
         "predictive_complete_outer_test_generated": True,
+        "expanded_local_baselines": list(EXPANDED_LOCAL_METHODS),
+        "expanded_global_baselines": list(EXPANDED_GLOBAL_METHODS),
+        "expanded_glocal_baselines": list(EXPANDED_GLOCAL_METHODS),
+        "expanded_baselines_enabled": str(getattr(args, "expanded_baselines", "full")) != "off",
+        "nex_mathematical_core_modified_for_baselines": False,
+        "rloco_reference": RLOCO_REFERENCE,
         "predictive_tables": sorted(predictive_outputs),
         "pdf_report_requested": not bool(getattr(args, "skip_pdf_report", False)),
         "statistical_tables": sorted(statistical_outputs),
@@ -5233,7 +5350,7 @@ def aggregate_results(results: Sequence[Dict[str, Any]], output_root: Path, args
         "mathematical_core_sha256": EXPECTED_ENGINE_SHA256,
         "passed": True,
     }
-    engine.write_json(audit, output_root / "audit_validation_v68_glopro_complete.json")
+    engine.write_json(audit, output_root / "audit_validation_v70_expanded_xai.json")
     manifest = {
         **audit,
         "global_definition": METHOD_DEFINITION,
@@ -5243,7 +5360,7 @@ def aggregate_results(results: Sequence[Dict[str, Any]], output_root: Path, args
         "test_fidelity_used_for_routing": False,
         "configuration": _public_configuration(args),
     }
-    engine.write_json(manifest, output_root / "manifest_v68_glopro_complete.json")
+    engine.write_json(manifest, output_root / "manifest_v70_expanded_xai.json")
     engine.write_json(manifest, output_root / "registro_protocolo_confirmatorio.json")
 
     _sanitize_text_artifacts(output_root)
@@ -5264,7 +5381,7 @@ def aggregate_results(results: Sequence[Dict[str, Any]], output_root: Path, args
         "report_name": "relatorio.pdf",
         "source_is_current_experiment": True,
         "passed": bool(report_path is not None or getattr(args, "skip_pdf_report", False)),
-    }, output_root / "audit_relatorio_v68.json")
+    }, output_root / "audit_relatorio_v70.json")
 
 
 
@@ -5324,10 +5441,6 @@ def _load_sklearn_bundle(name: str) -> Any:
         raw = sk_datasets.load_wine()
         labels = np.asarray([raw.target_names[int(index)] for index in raw.target], dtype=str)
         notes = ["Wine multiclass benchmark; three classes and thirteen numerical attributes."]
-    elif name == "digits_multiclass":
-        raw = sk_datasets.load_digits()
-        labels = np.asarray(raw.target, dtype=str)
-        notes = ["Digits multiclass stress test; ten classes and sixty-four pixel attributes."]
     elif name == "breast_cancer_diagnostic":
         raw = sk_datasets.load_breast_cancer()
         labels = np.asarray([raw.target_names[int(index)] for index in raw.target], dtype=str)
@@ -5365,7 +5478,7 @@ def _load_ionosphere(data_dir: Path, allow_download: bool) -> Any:
     )
 
 
-def _load_v68_bundle(name: str, args: argparse.Namespace) -> Any:
+def _load_v70_bundle(name: str, args: argparse.Namespace) -> Any:
     canonical = _canonical_dataset_name(name)
     data_dir = Path(args.data_dir)
     allow_download = not bool(args.no_download)
@@ -5387,7 +5500,7 @@ def _load_v68_bundle(name: str, args: argparse.Namespace) -> Any:
     if canonical in OPTIONAL_DATASETS or canonical == "wine_multiclass":
         return _load_sklearn_bundle(canonical)
     valid = sorted(set(REPLICATION_DATASETS + GENERALIZATION_DATASETS + OPTIONAL_DATASETS))
-    raise ValueError(f"Invalid dataset '{name}'. Valid v68 datasets: {valid}")
+    raise ValueError(f"Invalid dataset '{name}'. Valid v70 datasets: {valid}")
 
 
 def _dataset_context(bundle: Any, phase: str, evidence_role: str, scenario: str) -> Dict[str, Any]:
@@ -5431,7 +5544,7 @@ def _validate_seed_independence(args: argparse.Namespace, proposed: Sequence[int
     overlap = sorted(previous.intersection(map(int, proposed)))
     if overlap and not bool(args.allow_seed_overlap):
         raise ValueError(
-            "The v68 replication seeds overlap the registered original confirmatory battery. "
+            "The replication seeds overlap the registered original confirmatory battery. "
             f"Overlap: {overlap}. Change --replication-random-state or pass --allow-seed-overlap only for an explicit audit."
         )
 
@@ -5446,7 +5559,7 @@ def _study_specs(args: argparse.Namespace) -> List[Dict[str, Any]]:
         specs.append({
             "phase": "independent_replication",
             "evidence_role": "replication_of_original_three_benchmarks",
-            "scenario": "replication_original_benchmarks_v68_glopro_complete",
+            "scenario": "replication_original_benchmarks_v70_expanded_xai",
             "datasets": _parse_dataset_list(args.replication_datasets),
             "repeats": int(args.replication_repeats),
             "random_state": int(args.replication_random_state),
@@ -5463,7 +5576,7 @@ def _study_specs(args: argparse.Namespace) -> List[Dict[str, Any]]:
             specs.append({
                 "phase": "target_proxy_control",
                 "evidence_role": "electrical_grid_without_stab_robustness",
-                "scenario": "grid_without_stab_control_v68_glopro_complete",
+                "scenario": "grid_without_stab_control_v70_expanded_xai",
                 "datasets": grid_control,
                 "repeats": int(args.generalization_repeats),
                 "random_state": int(args.generalization_random_state),
@@ -5472,7 +5585,7 @@ def _study_specs(args: argparse.Namespace) -> List[Dict[str, Any]]:
             specs.append({
                 "phase": "external_generalization",
                 "evidence_role": "new_datasets_multiclass_and_dimensional_validation",
-                "scenario": "external_generalization_v68_glopro_complete",
+                "scenario": "external_generalization_v70_expanded_xai",
                 "datasets": external,
                 "repeats": int(args.generalization_repeats),
                 "random_state": int(args.generalization_random_state),
@@ -5481,7 +5594,7 @@ def _study_specs(args: argparse.Namespace) -> List[Dict[str, Any]]:
         specs.append({
             "phase": "custom_frozen_math_evaluation",
             "evidence_role": "user_defined_extension",
-            "scenario": "custom_frozen_math_v68_glopro_complete",
+            "scenario": "custom_frozen_math_v70_expanded_xai",
             "datasets": _parse_dataset_list(args.datasets),
             "repeats": int(args.real_repetitions),
             "random_state": int(args.random_state),
@@ -5501,7 +5614,7 @@ def _study_specs(args: argparse.Namespace) -> List[Dict[str, Any]]:
     return specs
 
 
-def _write_v68_study_plan(root: Path, args: argparse.Namespace, specs: Sequence[Mapping[str, Any]]) -> None:
+def _write_v70_study_plan(root: Path, args: argparse.Namespace, specs: Sequence[Mapping[str, Any]]) -> None:
     rows: List[Dict[str, Any]] = []
     seed_rows: List[Dict[str, Any]] = []
     for spec in specs:
@@ -5533,8 +5646,8 @@ def _write_v68_study_plan(root: Path, args: argparse.Namespace, specs: Sequence[
                     int(seed) not in set(_seed_sequence(args.previous_confirmatory_seed_start, args.previous_confirmatory_repeats))
                 ),
             })
-    engine.write_csv(pd.DataFrame(rows), Path(root) / "plano_validacao_completa_v68.csv")
-    engine.write_csv(pd.DataFrame(seed_rows), Path(root) / "registro_seeds_v68.csv")
+    engine.write_csv(pd.DataFrame(rows), Path(root) / "plano_validacao_completa_v70.csv")
+    engine.write_csv(pd.DataFrame(seed_rows), Path(root) / "registro_seeds_v70.csv")
     claims = pd.DataFrame([
         {
             "claim": "NEX-ELM improves fidelity and explanatory granularity over X-ELM",
@@ -5562,16 +5675,16 @@ def _write_v68_study_plan(root: Path, args: argparse.Namespace, specs: Sequence[
             "scope": "all tests are post-evaluation analyses",
         },
     ])
-    engine.write_csv(claims, Path(root) / "limites_de_alegacao_v68.csv")
+    engine.write_csv(claims, Path(root) / "limites_de_alegacao_v70.csv")
 
 
 
-# ---------------------------------------------------------------------------
-# Predictive performance audit on the complete outer test set.
-# These wrappers observe the exact frozen ELM instance and split used by the
-# explanation experiment. They do not change training, predictions, or any
-# mathematical output.
-# ---------------------------------------------------------------------------
+
+
+
+
+
+
 
 def _capture_split_outer_and_calibration(bundle: Any, seed: int, calibration_fraction: float):
     outcome = _ENGINE_SPLIT_OUTER_AND_CALIBRATION(bundle, seed, calibration_fraction)
@@ -5579,7 +5692,10 @@ def _capture_split_outer_and_calibration(bundle: Any, seed: int, calibration_fra
     if key is not None:
         X_train, X_test, y_train, y_test, cal_idx = outcome
         _PREDICTIVE_CAPTURE.setdefault(key, {}).update({
-            "X_test": np.asarray(X_test),
+            "X_train_outer": np.asarray(X_train, dtype=float),
+            "y_train_outer": np.asarray(y_train).astype(str),
+            "calibration_indices": np.asarray(cal_idx, dtype=int),
+            "X_test": np.asarray(X_test, dtype=float),
             "y_test": np.asarray(y_test).astype(str),
             "n_train_outer": int(len(X_train)),
             "n_test": int(len(X_test)),
@@ -5595,6 +5711,8 @@ def _capture_build_ensemble(args: argparse.Namespace, runtime: Any, X_train: np.
         ensemble = outcome[0] if isinstance(outcome, tuple) else outcome
         _PREDICTIVE_CAPTURE.setdefault(key, {}).update({
             "ensemble": ensemble,
+            "X_fit": np.asarray(X_train, dtype=float),
+            "y_fit": np.asarray(y_train).astype(str),
             "n_fit": int(len(X_train)),
         })
     return outcome
@@ -5772,7 +5890,719 @@ def _predictive_test_artifacts(
     }
 
 
-def _evaluate_bundle_v68(
+
+
+
+
+
+
+def _v70_softmax(scores: np.ndarray) -> np.ndarray:
+    scores = np.asarray(scores, dtype=float)
+    shifted = scores - np.max(scores, axis=1, keepdims=True)
+    exp = np.exp(np.clip(shifted, -700.0, 700.0))
+    return exp / np.maximum(exp.sum(axis=1, keepdims=True), 1e-15)
+
+
+def _v70_probability_gradient_numpy(model: Any, points: np.ndarray, targets: Sequence[int]) -> np.ndarray:
+    points = np.asarray(points, dtype=float)
+    targets = np.asarray(targets, dtype=int)
+    W = np.asarray(model.W_super_, dtype=float)
+    b = np.asarray(model.b_super_, dtype=float)
+    beta = np.asarray(model.beta_super_, dtype=float)
+    z = points @ W + b
+    h = model._activation_np(z)
+    derivative = model._activation_derivative_np(z)
+    scores = h @ beta
+    probabilities = _v70_softmax(scores)
+    beta_target = beta[:, targets].T
+    dscore_target = (derivative * beta_target) @ W.T
+    beta_mean = probabilities @ beta.T
+    dscore_mean = (derivative * beta_mean) @ W.T
+    target_probability = probabilities[np.arange(len(points)), targets]
+    return target_probability[:, None] * (dscore_target - dscore_mean)
+
+
+def _v70_integrated_gradients(
+    model: Any,
+    X: np.ndarray,
+    targets: np.ndarray,
+    baseline: np.ndarray,
+    nodes: int,
+) -> Tuple[np.ndarray, float, np.ndarray]:
+    started = time.perf_counter()
+    X = np.asarray(X, dtype=float)
+    baseline = np.asarray(baseline, dtype=float).reshape(1, -1)
+    raw_nodes, raw_weights = np.polynomial.legendre.leggauss(int(nodes))
+    alpha = (raw_nodes + 1.0) / 2.0
+    weights = raw_weights / 2.0
+    attributions = np.zeros_like(X)
+    for index, x in enumerate(X):
+        delta = x - baseline[0]
+        points = baseline + alpha[:, None] * delta[None, :]
+        target_array = np.full(len(points), int(targets[index]), dtype=int)
+        gradients = _v70_probability_gradient_numpy(model, points, target_array)
+        attributions[index] = delta * np.sum(gradients * weights[:, None], axis=0)
+    probabilities = np.asarray(model.predict_proba(X), dtype=float)
+    base_probabilities = np.asarray(model.predict_proba(baseline), dtype=float)[0]
+    expected_delta = probabilities[np.arange(len(X)), targets] - base_probabilities[targets]
+    completeness_error = attributions.sum(axis=1) - expected_delta
+    return attributions, float(time.perf_counter() - started), completeness_error
+
+
+def _v70_gradient_shap(
+    model: Any,
+    X: np.ndarray,
+    targets: np.ndarray,
+    backgrounds: np.ndarray,
+    samples: int,
+    seed: int,
+) -> Tuple[np.ndarray, float]:
+    started = time.perf_counter()
+    X = np.asarray(X, dtype=float)
+    backgrounds = np.asarray(backgrounds, dtype=float)
+    rng = np.random.default_rng(int(seed))
+    feature_scale = np.std(backgrounds, axis=0, ddof=1)
+    feature_scale = np.where(np.isfinite(feature_scale) & (feature_scale > 1e-8), feature_scale, 1.0)
+    attributions = np.zeros_like(X)
+    for index, x in enumerate(X):
+        background_indices = rng.integers(0, len(backgrounds), size=int(samples))
+        baselines = backgrounds[background_indices]
+        alpha = rng.uniform(0.0, 1.0, size=(int(samples), 1))
+        noise = rng.normal(0.0, 0.01, size=baselines.shape) * feature_scale[None, :]
+        points = baselines + alpha * (x[None, :] - baselines) + noise
+        target_array = np.full(len(points), int(targets[index]), dtype=int)
+        gradients = _v70_probability_gradient_numpy(model, points, target_array)
+        attributions[index] = np.mean((x[None, :] - baselines) * gradients, axis=0)
+    return attributions, float(time.perf_counter() - started)
+
+
+def _v70_lime(
+    model: Any,
+    X: np.ndarray,
+    targets: np.ndarray,
+    reference: np.ndarray,
+    samples: int,
+    seed: int,
+) -> Tuple[np.ndarray, float]:
+    started = time.perf_counter()
+    X = np.asarray(X, dtype=float)
+    reference = np.asarray(reference, dtype=float)
+    rng = np.random.default_rng(int(seed))
+    scale = np.std(reference, axis=0, ddof=1)
+    scale = np.where(np.isfinite(scale) & (scale > 1e-8), scale, 1.0)
+    lower = np.min(reference, axis=0)
+    upper = np.max(reference, axis=0)
+    n_features = X.shape[1]
+    kernel_width = max(0.75 * math.sqrt(n_features), 1.0)
+    attributions = np.zeros_like(X)
+    ridge = 1e-5
+    for index, x in enumerate(X):
+        perturb = rng.normal(0.0, 0.75, size=(int(samples) - 1, n_features)) * scale[None, :]
+        samples_x = np.vstack([x, np.clip(x[None, :] + perturb, lower, upper)])
+        standardized = (samples_x - x[None, :]) / scale[None, :]
+        distances = np.linalg.norm(standardized, axis=1)
+        weights = np.exp(-(distances ** 2) / (kernel_width ** 2))
+        probabilities = np.asarray(model.predict_proba(samples_x), dtype=float)[:, int(targets[index])]
+        design = np.column_stack([np.ones(len(samples_x)), standardized])
+        weighted_design = design * np.sqrt(weights)[:, None]
+        weighted_target = probabilities * np.sqrt(weights)
+        penalty = np.eye(n_features + 1) * ridge
+        penalty[0, 0] = 0.0
+        try:
+            coefficients = np.linalg.solve(weighted_design.T @ weighted_design + penalty, weighted_design.T @ weighted_target)
+        except np.linalg.LinAlgError:
+            coefficients = np.linalg.pinv(weighted_design.T @ weighted_design + penalty) @ (weighted_design.T @ weighted_target)
+        attributions[index] = coefficients[1:]
+    return attributions, float(time.perf_counter() - started)
+
+
+def _v70_log_loss_rows(y: Sequence[Any], probabilities: np.ndarray, classes: Sequence[Any]) -> np.ndarray:
+    labels = np.asarray(y).astype(str)
+    class_values = np.asarray(classes).astype(str)
+    mapping = {label: index for index, label in enumerate(class_values)}
+    indices = np.asarray([mapping[str(label)] for label in labels], dtype=int)
+    clipped = np.clip(np.asarray(probabilities, dtype=float), 1e-12, 1.0)
+    return -np.log(clipped[np.arange(len(indices)), indices])
+
+
+def _v70_binary_log_loss_rows(y_binary: np.ndarray, probabilities: np.ndarray) -> np.ndarray:
+    probability = np.clip(np.asarray(probabilities, dtype=float), 1e-12, 1.0 - 1e-12)
+    target = np.asarray(y_binary, dtype=float)
+    return -(target * np.log(probability) + (1.0 - target) * np.log(1.0 - probability))
+
+
+def _v70_permutation_importance(
+    model: Any,
+    X_cal: np.ndarray,
+    y_cal: np.ndarray,
+    repeats: int,
+    seed: int,
+) -> Tuple[Dict[int, np.ndarray], np.ndarray, float, pd.DataFrame]:
+    started = time.perf_counter()
+    X_cal = np.asarray(X_cal, dtype=float)
+    y_cal = np.asarray(y_cal).astype(str)
+    classes = np.asarray(model.classes_).astype(str)
+    base_probability = np.asarray(model.predict_proba(X_cal), dtype=float)
+    rng = np.random.default_rng(int(seed))
+    classwise: Dict[int, np.ndarray] = {}
+    repeat_rows: List[Dict[str, Any]] = []
+    for class_index, class_label in enumerate(classes):
+        target = (y_cal == class_label).astype(float)
+        base_loss = float(np.mean(_v70_binary_log_loss_rows(target, base_probability[:, class_index])))
+        importance = np.zeros(X_cal.shape[1], dtype=float)
+        for feature in range(X_cal.shape[1]):
+            losses: List[float] = []
+            for repeat in range(int(repeats)):
+                permuted = X_cal.copy()
+                permuted[:, feature] = permuted[rng.permutation(len(permuted)), feature]
+                probability = np.asarray(model.predict_proba(permuted), dtype=float)[:, class_index]
+                loss = float(np.mean(_v70_binary_log_loss_rows(target, probability)))
+                losses.append(loss - base_loss)
+                repeat_rows.append({
+                    "target_class_index": int(class_index), "target_class": str(class_label),
+                    "feature_index": int(feature), "repeat": int(repeat), "loss_increase": float(loss - base_loss),
+                })
+            importance[feature] = float(np.mean(losses))
+        classwise[int(class_index)] = importance
+    aggregate = np.mean(np.vstack([np.maximum(values, 0.0) for values in classwise.values()]), axis=0)
+    return classwise, aggregate, float(time.perf_counter() - started), pd.DataFrame(repeat_rows)
+
+
+def _v70_sage(
+    model: Any,
+    X_cal: np.ndarray,
+    y_cal: np.ndarray,
+    backgrounds: np.ndarray,
+    permutations: int,
+    evaluation_rows: int,
+    seed: int,
+) -> Tuple[Dict[int, np.ndarray], np.ndarray, float, pd.DataFrame]:
+
+    started = time.perf_counter()
+    X_cal = np.asarray(X_cal, dtype=float)
+    y_cal = np.asarray(y_cal).astype(str)
+    backgrounds = np.asarray(backgrounds, dtype=float)
+    classes = np.asarray(model.classes_).astype(str)
+    rng = np.random.default_rng(int(seed))
+    row_count = min(int(evaluation_rows), len(X_cal))
+    row_indices = rng.choice(len(X_cal), size=row_count, replace=False)
+    X_eval = X_cal[row_indices]
+    y_eval = y_cal[row_indices]
+    n_features = X_eval.shape[1]
+    totals = {int(c): np.zeros(n_features, dtype=float) for c in range(len(classes))}
+    square_totals = {int(c): np.zeros(n_features, dtype=float) for c in range(len(classes))}
+    for permutation_index in range(int(permutations)):
+        order = rng.permutation(n_features)
+        background_rows = backgrounds[rng.integers(0, len(backgrounds), size=row_count)].copy()
+        current = background_rows
+        probability = np.asarray(model.predict_proba(current), dtype=float)
+        previous_losses = {
+            int(c): _v70_binary_log_loss_rows((y_eval == classes[c]).astype(float), probability[:, c])
+            for c in range(len(classes))
+        }
+        for feature in order:
+            current = current.copy()
+            current[:, feature] = X_eval[:, feature]
+            probability = np.asarray(model.predict_proba(current), dtype=float)
+            for c in range(len(classes)):
+                new_loss = _v70_binary_log_loss_rows((y_eval == classes[c]).astype(float), probability[:, c])
+                contribution = float(np.mean(previous_losses[c] - new_loss))
+                totals[c][feature] += contribution
+                square_totals[c][feature] += contribution ** 2
+                previous_losses[c] = new_loss
+    classwise = {c: totals[c] / float(permutations) for c in totals}
+    aggregate = np.mean(np.vstack([np.maximum(values, 0.0) for values in classwise.values()]), axis=0)
+    diagnostics: List[Dict[str, Any]] = []
+    for c, values in classwise.items():
+        variance = np.maximum(square_totals[c] / float(permutations) - values ** 2, 0.0)
+        standard_error = np.sqrt(variance / max(1, int(permutations)))
+        for feature, value in enumerate(values):
+            diagnostics.append({
+                "target_class_index": int(c), "target_class": str(classes[c]),
+                "feature_index": int(feature), "sage_value": float(value),
+                "monte_carlo_standard_error": float(standard_error[feature]),
+                "permutations": int(permutations), "evaluation_rows": int(row_count),
+                "imputer": "marginal_empirical_background",
+            })
+    return classwise, aggregate, float(time.perf_counter() - started), pd.DataFrame(diagnostics)
+
+
+def _v70_fit_reduced_elm_models(
+    args: argparse.Namespace,
+    runtime: Any,
+    X_fit: np.ndarray,
+    y_fit: np.ndarray,
+    n_features: int,
+    seed: int,
+) -> Tuple[Dict[int, Any], pd.DataFrame, float]:
+    started = time.perf_counter()
+    models: Dict[int, Any] = {}
+    rows: List[Dict[str, Any]] = []
+    feature_limit = int(getattr(args, "rloco_max_features", 0))
+    selected_features = list(range(n_features))
+    if feature_limit > 0 and feature_limit < n_features:
+
+        selected_features = selected_features[:feature_limit]
+    for feature in selected_features:
+        reduced_X = np.delete(np.asarray(X_fit, dtype=float), feature, axis=1)
+        feature_started = time.perf_counter()
+        outcome = _ENGINE_BUILD_ENSEMBLE(args, runtime, reduced_X, y_fit, int(seed) + 900001 + feature * 1009)
+        model = outcome[0] if isinstance(outcome, tuple) else outcome
+        models[int(feature)] = model
+        rows.append({
+            "feature_index": int(feature),
+            "fit_seconds": float(time.perf_counter() - feature_started),
+            "n_fit_rows": int(len(reduced_X)),
+            "n_features_reduced_model": int(reduced_X.shape[1]),
+        })
+    return models, pd.DataFrame(rows), float(time.perf_counter() - started)
+
+
+def _v70_rloco(
+    full_model: Any,
+    reduced_models: Mapping[int, Any],
+    X_cal: np.ndarray,
+    y_cal: np.ndarray,
+    X_test: np.ndarray,
+    requested_regions: int,
+    seed: int,
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, pd.DataFrame, pd.DataFrame, pd.DataFrame, float]:
+    from sklearn.cluster import KMeans
+    from sklearn.metrics import silhouette_score
+
+    started = time.perf_counter()
+    X_cal = np.asarray(X_cal, dtype=float)
+    X_test = np.asarray(X_test, dtype=float)
+    y_cal = np.asarray(y_cal).astype(str)
+    classes = np.asarray(full_model.classes_).astype(str)
+    mapping = {label: index for index, label in enumerate(classes)}
+    y_indices = np.asarray([mapping[str(label)] for label in y_cal], dtype=int)
+    full_probability = np.asarray(full_model.predict_proba(X_cal), dtype=float)
+    full_conformity = np.log(np.clip(full_probability[np.arange(len(X_cal)), y_indices], 1e-12, 1.0))
+    delta = np.zeros((len(X_cal), X_cal.shape[1]), dtype=float)
+    evaluated = np.zeros(X_cal.shape[1], dtype=bool)
+    for feature, reduced_model in reduced_models.items():
+        reduced_probability = np.asarray(reduced_model.predict_proba(np.delete(X_cal, feature, axis=1)), dtype=float)
+        reduced_classes = np.asarray(reduced_model.classes_).astype(str)
+        reduced_mapping = {label: index for index, label in enumerate(reduced_classes)}
+        reduced_indices = np.asarray([reduced_mapping[str(label)] for label in y_cal], dtype=int)
+        reduced_conformity = np.log(np.clip(reduced_probability[np.arange(len(X_cal)), reduced_indices], 1e-12, 1.0))
+        delta[:, int(feature)] = full_conformity - reduced_conformity
+        evaluated[int(feature)] = True
+
+    scale = np.std(delta[:, evaluated], axis=0, ddof=1) if np.any(evaluated) else np.ones(1)
+    scale = np.where(np.isfinite(scale) & (scale > 1e-10), scale, 1.0)
+    representation = np.zeros_like(delta)
+    if np.any(evaluated):
+        representation[:, evaluated] = (delta[:, evaluated] - np.mean(delta[:, evaluated], axis=0)) / scale
+    max_regions = max(1, min(int(requested_regions), len(X_cal)))
+    if max_regions == 1 or len(X_cal) < 4:
+        labels = np.zeros(len(X_cal), dtype=int)
+        n_regions = 1
+        silhouette = np.nan
+    else:
+        n_regions = max(2, min(max_regions, len(X_cal) // 2))
+        clusterer = KMeans(n_clusters=n_regions, random_state=int(seed), n_init=20)
+        labels = clusterer.fit_predict(representation)
+        silhouette = float(silhouette_score(representation, labels)) if len(np.unique(labels)) > 1 else np.nan
+
+    regional_importance = np.zeros((n_regions, X_cal.shape[1]), dtype=float)
+    input_centroids = np.zeros((n_regions, X_cal.shape[1]), dtype=float)
+    region_members: List[np.ndarray] = []
+    region_rows: List[Dict[str, Any]] = []
+    assignment_rows: List[Dict[str, Any]] = []
+    for region in range(n_regions):
+        mask = labels == region
+        members = X_cal[mask]
+        region_members.append(members)
+        regional_importance[region] = np.mean(delta[mask], axis=0)
+        input_centroids[region] = np.mean(members, axis=0)
+        within_variance = float(np.mean(np.var(delta[mask], axis=0))) if np.sum(mask) > 1 else 0.0
+        region_rows.append({
+            "region_id": int(region), "calibration_rows": int(np.sum(mask)),
+            "coverage": float(np.mean(mask)), "within_importance_variance": within_variance,
+            "silhouette_global": silhouette, "conformity": "true_class_log_probability",
+            "partition_space": "per_observation_LOCO_importance",
+            "routing_space": "sum_euclidean_distance_to_calibration_cluster_members",
+        })
+        member_indices = np.where(mask)[0]
+        for row_index in member_indices:
+            aggregate_distance = float(np.linalg.norm(X_cal[row_index][None, :] - members, axis=1).sum())
+            assignment_rows.append({
+                "split": "calibration", "row_index": int(row_index), "region_id": int(region),
+                "routing_distance_sum": aggregate_distance, "undecidable_tie": False,
+            })
+
+
+
+    distances = np.zeros((len(X_test), n_regions), dtype=float)
+    for region, members in enumerate(region_members):
+        distances[:, region] = np.linalg.norm(
+            X_test[:, None, :] - members[None, :, :], axis=2
+        ).sum(axis=1)
+    test_regions = np.argmin(distances, axis=1).astype(int)
+    for row_index, region in enumerate(test_regions):
+        ordered = np.sort(distances[row_index])
+        tie = bool(len(ordered) > 1 and np.isclose(ordered[0], ordered[1], rtol=1e-12, atol=1e-12))
+        assignment_rows.append({
+            "split": "test", "row_index": int(row_index), "region_id": int(region),
+            "routing_distance_sum": float(distances[row_index, region]),
+            "undecidable_tie": tie,
+        })
+
+    global_importance = np.mean(delta, axis=0)
+    diagnostic_rows: List[Dict[str, Any]] = []
+    k = engine.dynamic_top_k(X_cal.shape[1])
+    for row_index, region in enumerate(labels):
+        diagnostic_rows.append({
+            "calibration_row": int(row_index), "region_id": int(region),
+            "local_regional_pearson": engine.safe_pearson(delta[row_index], regional_importance[region]),
+            "local_regional_spearman": engine.safe_spearman(delta[row_index], regional_importance[region]),
+            "local_regional_top_k_overlap": engine.top_overlap(delta[row_index], regional_importance[region], k),
+            "regional_global_pearson": engine.safe_pearson(regional_importance[region], global_importance),
+            "regional_global_spearman": engine.safe_spearman(regional_importance[region], global_importance),
+            "regional_global_top_k_overlap": engine.top_overlap(regional_importance[region], global_importance, k),
+        })
+    return (
+        delta, regional_importance, test_regions,
+        pd.DataFrame(region_rows), pd.DataFrame(assignment_rows), pd.DataFrame(diagnostic_rows),
+        float(time.perf_counter() - started),
+    )
+
+
+def _v70_orders(values: np.ndarray) -> List[List[int]]:
+    array = np.asarray(values, dtype=float)
+    return [engine.top_indices(row, array.shape[1]).tolist() for row in array]
+
+
+def _v70_auc_seed_metrics(
+    dataset: str,
+    scenario: str,
+    seed: int,
+    scope: str,
+    auc: Mapping[str, Mapping[str, Sequence[float]]],
+) -> pd.DataFrame:
+    rows: List[Dict[str, Any]] = []
+    methods = sorted(set(auc.get("deletion", {})).union(auc.get("insertion", {})))
+    for method in methods:
+        deletion_values = np.asarray(auc.get("deletion", {}).get(method, []), dtype=float)
+        insertion_values = np.asarray(auc.get("insertion", {}).get(method, []), dtype=float)
+        deletion = float(np.mean(deletion_values)) if deletion_values.size else np.nan
+        insertion = float(np.mean(insertion_values)) if insertion_values.size else np.nan
+        composite = float(np.nanmean([deletion, insertion]))
+        for metric, value in (("deletion_auc", deletion), ("insertion_auc", insertion), ("composite_auc", composite)):
+            rows.append({
+                "dataset": str(dataset), "scenario": str(scenario), "seed": int(seed),
+                "scope": str(scope), "metric": metric, "method": str(method), "value": value,
+            })
+    return pd.DataFrame(rows)
+
+
+def _v70_attribution_table(
+    dataset: str,
+    scenario: str,
+    seed: int,
+    sample_ids: Sequence[str],
+    feature_names: Sequence[str],
+    values_by_method: Mapping[str, np.ndarray],
+) -> pd.DataFrame:
+    rows: List[Dict[str, Any]] = []
+    for method, matrix in values_by_method.items():
+        matrix = np.asarray(matrix, dtype=float)
+        for sample_index, sample_id in enumerate(sample_ids):
+            normalized = engine.normalize_abs(matrix[sample_index])
+            order = engine.top_indices(matrix[sample_index], matrix.shape[1]).tolist()
+            rank = {feature: position + 1 for position, feature in enumerate(order)}
+            for feature_index, feature_name in enumerate(feature_names):
+                rows.append({
+                    "dataset": dataset, "scenario": scenario, "seed": int(seed),
+                    "sample_id": str(sample_id), "method": str(method),
+                    "feature_index": int(feature_index), "feature": str(feature_name),
+                    "attribution": float(matrix[sample_index, feature_index]),
+                    "absolute_normalized_attribution": float(normalized[feature_index]),
+                    "rank": int(rank[feature_index]),
+                })
+    return pd.DataFrame(rows)
+
+
+def _v70_expanded_baseline_artifacts(
+    *,
+    bundle: Any,
+    args: argparse.Namespace,
+    runtime: Any,
+    seed: int,
+    scenario: str,
+    capture: Mapping[str, Any],
+    existing_result: Mapping[str, Any],
+) -> Dict[str, pd.DataFrame]:
+    if str(getattr(args, "expanded_baselines", "full")) == "off":
+        return {}
+    model = capture.get("ensemble")
+    X_train = capture.get("X_train_outer")
+    y_train = capture.get("y_train_outer")
+    cal_idx = capture.get("calibration_indices")
+    X_fit = capture.get("X_fit")
+    y_fit = capture.get("y_fit")
+    X_test = capture.get("X_test")
+    if any(item is None for item in (model, X_train, y_train, cal_idx, X_fit, y_fit, X_test)):
+        raise RuntimeError(f"v70 comparator capture is incomplete for {bundle.name}, seed {seed}.")
+    X_train = np.asarray(X_train, dtype=float)
+    y_train = np.asarray(y_train).astype(str)
+    cal_idx = np.asarray(cal_idx, dtype=int)
+    X_fit = np.asarray(X_fit, dtype=float)
+    y_fit = np.asarray(y_fit).astype(str)
+    X_test = np.asarray(X_test, dtype=float)
+    X_calibration = X_train[cal_idx]
+    y_calibration = y_train[cal_idx]
+    cal_positions = engine.select_rows(
+        len(X_calibration), min(int(args.global_calibration_explain), len(X_calibration)), int(seed) + 131
+    )
+    X_cal = X_calibration[cal_positions]
+    y_cal = y_calibration[cal_positions]
+    explain_backgrounds_raw, eval_backgrounds_raw = _ENGINE_BACKGROUND_POOLS(
+        X_fit, y_fit, min(int(args.shap_background), len(X_fit)), int(seed) + 101,
+        float(getattr(args, "v" + "34_background_eval_fraction")),
+    )
+    explain_backgrounds = (
+        np.mean(explain_backgrounds_raw, axis=0, keepdims=True)
+        if bool(getattr(bundle, "exact_shapley_available", False)) else explain_backgrounds_raw
+    )
+    eval_backgrounds = (
+        np.mean(eval_backgrounds_raw, axis=0, keepdims=True)
+        if bool(getattr(bundle, "exact_shapley_available", False)) else eval_backgrounds_raw
+    )
+
+    explain_positions = engine.select_rows(len(X_test), min(int(args.shap_explain), len(X_test)), int(seed) + 401)
+    X_explain = X_test[explain_positions]
+    local_targets = np.asarray(model.predict_indices(X_explain), dtype=int)
+    sample_ids = [f"test_{int(index)}" for index in explain_positions]
+
+    lime_values, lime_seconds = _v70_lime(
+        model, X_explain, local_targets, explain_backgrounds_raw,
+        int(args.lime_samples), int(seed) + 690101,
+    )
+    ig_values, ig_seconds, ig_completeness = _v70_integrated_gradients(
+        model, X_explain, local_targets, np.mean(explain_backgrounds, axis=0),
+        int(args.integrated_gradients_nodes),
+    )
+    gradient_shap_values, gradient_shap_seconds = _v70_gradient_shap(
+        model, X_explain, local_targets, explain_backgrounds_raw,
+        int(args.gradient_shap_samples), int(seed) + 690131,
+    )
+    local_values = {
+        "LIME": lime_values,
+        "Integrated Gradients": ig_values,
+        "Gradient SHAP": gradient_shap_values,
+    }
+    local_orders = {method: _v70_orders(values) for method, values in local_values.items()}
+    local_detail, local_summary, local_auc = _ENGINE_RANKED_FIDELITY(
+        model, X_explain, local_targets, local_orders, eval_backgrounds,
+        args.ablation_protocol, args.fidelity_random_repeats, int(seed) + 690151,
+        str(bundle.name), str(scenario), "local_fidelity", False,
+    )
+
+    pfi_class, pfi_global, pfi_seconds, pfi_diagnostics = _v70_permutation_importance(
+        model, X_cal, y_cal, int(args.permutation_importance_repeats), int(seed) + 690201,
+    )
+    sage_class, sage_global, sage_seconds, sage_diagnostics = _v70_sage(
+        model, X_cal, y_cal, explain_backgrounds_raw,
+        int(args.sage_permutations), int(args.sage_evaluation_rows), int(seed) + 690251,
+    )
+    global_positions = engine.select_rows(
+        len(X_test), min(int(args.global_test_instances), len(X_test)), int(seed) + 531
+    )
+    X_global = X_test[global_positions]
+    global_targets = np.asarray(model.predict_indices(X_global), dtype=int)
+    global_orders = {
+        "Permutation Importance": [engine.top_indices(pfi_class[int(target)], X_train.shape[1]).tolist() for target in global_targets],
+        "SAGE": [engine.top_indices(sage_class[int(target)], X_train.shape[1]).tolist() for target in global_targets],
+    }
+    global_detail, global_summary, global_auc = _ENGINE_RANKED_FIDELITY(
+        model, X_global, global_targets, global_orders, eval_backgrounds,
+        args.ablation_protocol, args.fidelity_random_repeats, int(seed) + 690301,
+        str(bundle.name), str(scenario), "global_fidelity", False,
+    )
+
+    reduced_models, reduced_fit, reduced_seconds = _v70_fit_reduced_elm_models(
+        args, runtime, X_fit, y_fit, X_train.shape[1], int(seed),
+    )
+    (
+        rloco_delta, rloco_regions, rloco_test_regions,
+        rloco_region_summary, rloco_assignments, rloco_diagnostics, rloco_seconds,
+    ) = _v70_rloco(
+        model, reduced_models, X_cal, y_cal, X_global,
+        int(args.rloco_regions), int(seed) + 690401,
+    )
+    rloco_orders = [
+        engine.top_indices(rloco_regions[int(region)], X_train.shape[1]).tolist()
+        for region in rloco_test_regions
+    ]
+    rloco_detail, rloco_summary, rloco_auc = _ENGINE_RANKED_FIDELITY(
+        model, X_global, global_targets, {"R-LOCO": rloco_orders}, eval_backgrounds,
+        args.ablation_protocol, args.fidelity_random_repeats, int(seed) + 690451,
+        str(bundle.name), str(scenario), "glocal_fidelity", False,
+    )
+    nex_detail = existing_result.get("global_fidelity_detail", pd.DataFrame())
+    nex_summary = existing_result.get("global_fidelity_summary", pd.DataFrame())
+    if isinstance(nex_detail, pd.DataFrame) and not nex_detail.empty and "method" in nex_detail:
+        nex_detail = nex_detail[nex_detail["method"].astype(str).eq("NEX-ELM")].copy()
+        nex_detail["scope"] = "glocal_fidelity"
+    else:
+        nex_detail = pd.DataFrame()
+    if isinstance(nex_summary, pd.DataFrame) and not nex_summary.empty and "method" in nex_summary:
+        nex_summary = nex_summary[nex_summary["method"].astype(str).eq("NEX-ELM")].copy()
+        nex_summary["scope"] = "glocal_fidelity"
+    else:
+        nex_summary = pd.DataFrame()
+    glocal_detail = pd.concat([nex_detail, rloco_detail], ignore_index=True, sort=False)
+    glocal_summary = pd.concat([nex_summary, rloco_summary], ignore_index=True, sort=False)
+
+    global_rows: List[Dict[str, Any]] = []
+    class_rows: List[Dict[str, Any]] = []
+    for feature_index, feature_name in enumerate(bundle.feature_names):
+        global_rows.append({
+            "dataset": str(bundle.name), "scenario": str(scenario), "seed": int(seed),
+            "feature_index": int(feature_index), "feature": str(feature_name),
+            "permutation_importance_global": float(pfi_global[feature_index]),
+            "sage_global": float(sage_global[feature_index]),
+        })
+        for class_index, class_label in enumerate(model.classes_):
+            class_rows.append({
+                "dataset": str(bundle.name), "scenario": str(scenario), "seed": int(seed),
+                "target_class_index": int(class_index), "target_class": str(class_label),
+                "feature_index": int(feature_index), "feature": str(feature_name),
+                "permutation_importance_class": float(pfi_class[int(class_index)][feature_index]),
+                "sage_class": float(sage_class[int(class_index)][feature_index]),
+            })
+
+    rloco_importance_rows: List[Dict[str, Any]] = []
+    for region in range(rloco_regions.shape[0]):
+        for feature_index, feature_name in enumerate(bundle.feature_names):
+            rloco_importance_rows.append({
+                "dataset": str(bundle.name), "scenario": str(scenario), "seed": int(seed),
+                "region_id": int(region), "feature_index": int(feature_index), "feature": str(feature_name),
+                "regional_importance": float(rloco_regions[region, feature_index]),
+            })
+
+    timing = pd.DataFrame([
+        {"dataset": bundle.name, "scenario": scenario, "seed": int(seed), "method": "LIME local per instance", "seconds": lime_seconds / max(1, len(X_explain)), "scope": "local", "definition": "Weighted local ridge on probability perturbations."},
+        {"dataset": bundle.name, "scenario": scenario, "seed": int(seed), "method": "Integrated Gradients local per instance", "seconds": ig_seconds / max(1, len(X_explain)), "scope": "local", "definition": "Single mean-baseline probability path integral."},
+        {"dataset": bundle.name, "scenario": scenario, "seed": int(seed), "method": "Gradient SHAP local per instance", "seconds": gradient_shap_seconds / max(1, len(X_explain)), "scope": "local", "definition": "Monte Carlo expected gradient with empirical baselines."},
+        {"dataset": bundle.name, "scenario": scenario, "seed": int(seed), "method": "Permutation Importance global complete", "seconds": pfi_seconds, "scope": "global", "definition": "Classwise one-vs-rest log-loss permutation importance on calibration data."},
+        {"dataset": bundle.name, "scenario": scenario, "seed": int(seed), "method": "SAGE global complete", "seconds": sage_seconds, "scope": "global", "definition": "Marginal-imputation Monte Carlo SAGE on calibration data."},
+        {"dataset": bundle.name, "scenario": scenario, "seed": int(seed), "method": "R-LOCO glocal complete", "seconds": reduced_seconds + rloco_seconds, "scope": "glocal", "definition": "Reduced ELMs, calibration LOCO representation, regional partition, and test routing."},
+    ])
+
+    seed_metrics = pd.concat([
+        _v70_auc_seed_metrics(bundle.name, scenario, seed, "local_fidelity", local_auc),
+        _v70_auc_seed_metrics(bundle.name, scenario, seed, "global_fidelity", global_auc),
+        _v70_auc_seed_metrics(bundle.name, scenario, seed, "glocal_fidelity", rloco_auc),
+    ], ignore_index=True)
+    for _, row in timing.iterrows():
+        metric = "local" if row["scope"] == "local" else ("global" if row["scope"] == "global" else "glocal")
+        seed_metrics.loc[len(seed_metrics)] = {
+            "dataset": bundle.name, "scenario": scenario, "seed": int(seed),
+            "scope": "timing", "metric": metric, "method": str(row["method"]), "value": float(row["seconds"]),
+        }
+
+    completeness = pd.DataFrame({
+        "dataset": str(bundle.name), "scenario": str(scenario), "seed": int(seed),
+        "sample_id": sample_ids,
+        "integrated_gradients_completeness_error": np.asarray(ig_completeness, dtype=float),
+        "integrated_gradients_completeness_absolute_error": np.abs(np.asarray(ig_completeness, dtype=float)),
+    })
+
+    outputs: Dict[str, pd.DataFrame] = {
+        "local_baseline_attributions": _v70_attribution_table(
+            str(bundle.name), str(scenario), int(seed), sample_ids, bundle.feature_names, local_values
+        ),
+        "local_baseline_fidelity_detail": local_detail,
+        "local_baseline_fidelity_summary": local_summary,
+        "local_baseline_completeness": completeness,
+        "global_baseline_importance": pd.DataFrame(global_rows),
+        "global_baseline_class_importance": pd.DataFrame(class_rows),
+        "global_baseline_fidelity_detail": global_detail,
+        "global_baseline_fidelity_summary": global_summary,
+        "permutation_importance_diagnostics": pfi_diagnostics,
+        "sage_diagnostics": sage_diagnostics,
+        "glocal_baseline_fidelity_detail": glocal_detail,
+        "glocal_baseline_fidelity_summary": glocal_summary,
+        "rloco_region_summary": rloco_region_summary,
+        "rloco_region_importance": pd.DataFrame(rloco_importance_rows),
+        "rloco_assignments": rloco_assignments,
+        "rloco_consistency_diagnostics": rloco_diagnostics,
+        "rloco_reduced_model_fits": reduced_fit,
+        "expanded_baseline_timing": timing,
+        "expanded_baseline_seed_metrics": seed_metrics,
+    }
+    for key, frame in list(outputs.items()):
+        if not isinstance(frame, pd.DataFrame):
+            continue
+        if not frame.empty:
+            frame["baseline_suite"] = "v70_external_comparators"
+            frame["nex_mathematical_core_modified"] = False
+            frame["outer_test_used_for_baseline_learning"] = False
+            frame["rloco_reference"] = RLOCO_REFERENCE
+        outputs[key] = _clean_frame(
+            frame, args=args, seed=int(seed), dataset=str(bundle.name), scenario=str(scenario)
+        ) if not frame.empty else frame
+    return outputs
+
+
+def _v70_generate_expanded_baseline_figures(combined: Path) -> None:
+    seed_metrics = _read_table(Path(combined) / "seed_metrics.csv")
+    if seed_metrics.empty:
+        return
+    output = engine.ensure_dir(Path(combined).parent / "graficos_baselines")
+    groups = [
+        ("local_fidelity", "composite_auc", "Comparacao local - AUC composta", "local_composite_auc"),
+        ("global_fidelity", "composite_auc", "Comparacao global - AUC composta", "global_composite_auc"),
+        ("glocal_fidelity", "composite_auc", "Comparacao glocal - AUC composta", "glocal_composite_auc"),
+    ]
+    for scope, metric, title, filename in groups:
+        subset = seed_metrics[
+            seed_metrics["scope"].astype(str).eq(scope)
+            & seed_metrics["metric"].astype(str).eq(metric)
+        ].copy()
+        if subset.empty:
+            continue
+        summary = subset.groupby("method", as_index=False)["value"].mean().sort_values("value", ascending=False)
+        fig, ax = plt.subplots(figsize=(10, 5.5))
+        ax.bar(summary["method"].astype(str), summary["value"].astype(float))
+        ax.set_title(title)
+        ax.set_ylabel("AUC composta")
+        ax.tick_params(axis="x", rotation=30)
+        fig.tight_layout()
+        for extension in GRAPH_FORMATS:
+            fig.savefig(output / f"{filename}.{extension}", dpi=220, bbox_inches="tight")
+        plt.close(fig)
+
+
+def _v70_append_seed_metrics(combined: Path, results: Sequence[Mapping[str, Any]], args: argparse.Namespace) -> pd.DataFrame:
+    current = _read_table(Path(combined) / "seed_metrics.csv")
+    frames = [item.get("expanded_baseline_seed_metrics") for item in results]
+    frames = [frame for frame in frames if isinstance(frame, pd.DataFrame) and not frame.empty]
+    if frames:
+        current = pd.concat([current] + frames, ignore_index=True, sort=False)
+
+
+    if not current.empty:
+        nex_glocal = current[
+            current["scope"].astype(str).eq("global_fidelity")
+            & current["method"].astype(str).eq("NEX-ELM")
+        ].copy()
+        if not nex_glocal.empty:
+            nex_glocal["scope"] = "glocal_fidelity"
+            current = pd.concat([current, nex_glocal], ignore_index=True, sort=False)
+    if not current.empty:
+        keys = [column for column in ("dataset", "scenario", "seed", "scope", "metric", "method") if column in current]
+        current = current.drop_duplicates(subset=keys, keep="last")
+        current = _clean_frame(current, args=args)
+    engine.write_csv(current, Path(combined) / "seed_metrics.csv")
+    return current
+
+
+def _evaluate_bundle_v70(
     bundle: Any,
     args: argparse.Namespace,
     runtime: Any,
@@ -5790,12 +6620,18 @@ def _evaluate_bundle_v68(
     finally:
         _CURRENT_PREDICTIVE_KEY = None
     if not teacher_direct:
+        capture = dict(_PREDICTIVE_CAPTURE.pop(key, {}))
+        expanded = _v70_expanded_baseline_artifacts(
+            bundle=bundle, args=args, runtime=runtime, seed=int(seed), scenario=str(scenario),
+            capture=capture, existing_result=result,
+        )
+        result.update(expanded)
         predictive = _predictive_test_artifacts(
             bundle=bundle,
             scenario=str(scenario),
             seed=int(seed),
             args=args,
-            capture=_PREDICTIVE_CAPTURE.pop(key, {}),
+            capture=capture,
         )
         if not predictive:
             raise RuntimeError(
@@ -5804,8 +6640,9 @@ def _evaluate_bundle_v68(
         result.update(predictive)
         table_dir = Path(root) / "per_seed" / str(bundle.name) / str(scenario) / f"seed_{int(seed)}" / "tabelas"
         table_dir.mkdir(parents=True, exist_ok=True)
-        for artifact_name, frame in predictive.items():
-            engine.write_csv(frame, table_dir / f"{artifact_name}.csv")
+        for artifact_name, frame in {**expanded, **predictive}.items():
+            if isinstance(frame, pd.DataFrame):
+                engine.write_csv(frame, table_dir / f"{artifact_name}.csv")
     return result
 
 
@@ -5999,9 +6836,9 @@ def _generate_predictive_figures(combined: Path, outputs: Mapping[str, pd.DataFr
     return figure_dir
 
 
-# ---------------------------------------------------------------------------
-# Detailed PDF report generator.
-# ---------------------------------------------------------------------------
+
+
+
 
 def _read_result_csv(path: Path) -> pd.DataFrame:
     if not path.exists() or path.stat().st_size <= 3:
@@ -6015,14 +6852,14 @@ def _read_result_csv(path: Path) -> pd.DataFrame:
             return pd.DataFrame()
 
 
-def _pdf_number(value: Any, digits: int = 4) -> str:
+def _pdf_number(value: Any, precision: int = 4) -> str:
     try:
         number = float(value)
         if not np.isfinite(number):
             return "NA"
-        if number != 0.0 and abs(number) < 10 ** (-digits):
+        if number != 0.0 and abs(number) < 10 ** (-precision):
             return f"{number:.2e}"
-        return f"{number:.{digits}f}"
+        return f"{number:.{precision}f}"
     except Exception:
         text = str(value)
         return text if len(text) <= 48 else text[:45] + "..."
@@ -6064,10 +6901,13 @@ def _generate_pdf_report(experiment_root: Path, args: Optional[argparse.Namespac
         "prototype_library_class_summary", "prototype_usage_summary", "prototype_routing_summary",
         "prototype_stability_between_seeds", "timing", "cuda_audit", "gpu_runtime", "calibration",
         "convergence", "exact_shapley", "support", "text_audit_findings",
+        "local_baseline_fidelity_summary", "global_baseline_fidelity_summary",
+        "glocal_baseline_fidelity_summary", "global_baseline_importance",
+        "rloco_region_summary", "rloco_consistency_diagnostics", "expanded_baseline_timing",
     ]
     data = {name: _read_result_csv(combined / f"{name}.csv") for name in table_names}
 
-    # Use a font with broad Latin coverage when available, without distributing it.
+
     body_font = "Helvetica"
     bold_font = "Helvetica-Bold"
     for candidate in (
@@ -6124,7 +6964,7 @@ def _generate_pdf_report(experiment_root: Path, args: Optional[argparse.Namespac
 
     class ReportDocTemplate(BaseDocTemplate):
         def __init__(self, filename: str):
-            BaseDocTemplate.__init__(self, filename, pagesize=A4, rightMargin=1.45 * cm, leftMargin=1.45 * cm, topMargin=1.45 * cm, bottomMargin=1.35 * cm, title="Relatorio NEX-ELM v68")
+            BaseDocTemplate.__init__(self, filename, pagesize=A4, rightMargin=1.45 * cm, leftMargin=1.45 * cm, topMargin=1.45 * cm, bottomMargin=1.35 * cm, title="Relatorio NEX-ELM v70")
             frame = Frame(self.leftMargin, self.bottomMargin, self.width, self.height, id="normal")
             self.addPageTemplates([PageTemplate(id="normal", frames=frame)])
             self._heading_counter = 0
@@ -6132,11 +6972,11 @@ def _generate_pdf_report(experiment_root: Path, args: Optional[argparse.Namespac
         def afterFlowable(self, flowable):
             if isinstance(flowable, Paragraph) and flowable.style.name in {"H1x", "H2x", "H3x"}:
                 level = {"H1x": 0, "H2x": 1, "H3x": 2}[flowable.style.name]
-                key = getattr(flowable, "_v68_bookmark_key", None)
+                key = getattr(flowable, "_v70_bookmark_key", None)
                 if key is None:
                     self._heading_counter += 1
                     key = f"heading_{self._heading_counter}"
-                    setattr(flowable, "_v68_bookmark_key", key)
+                    setattr(flowable, "_v70_bookmark_key", key)
                 text = flowable.getPlainText()
                 self.canv.bookmarkPage(key)
                 self.canv.addOutlineEntry(text, key, level=level, closed=False)
@@ -6210,7 +7050,7 @@ def _generate_pdf_report(experiment_root: Path, args: Optional[argparse.Namespac
         n_seeds = int(perf_seed["seed"].nunique())
 
     story: List[Any] = []
-    story += [Spacer(1, 1.8 * cm), P("NEX-ELM v68", "ReportTitle"), P("Relatorio completo de desempenho preditivo, fidelidade explicativa, estatistica, estabilidade, prototipos, tempo e auditoria CUDA", "ReportSubtitle")]
+    story += [Spacer(1, 1.8 * cm), P("NEX-ELM v70", "ReportTitle"), P("Relatorio completo com comparacoes locais, globais e glocais, desempenho preditivo, fidelidade, estatistica, estabilidade, tempo e auditoria CUDA", "ReportSubtitle")]
     story += [Spacer(1, 1.0 * cm)]
     cover_data = [
         [P("Campo", "Smallx"), P("Valor", "Smallx")],
@@ -6250,7 +7090,7 @@ def _generate_pdf_report(experiment_root: Path, args: Optional[argparse.Namespac
     story += [H("2. Protocolo e bases", 1)]
     story += [P("O protocolo usa treino, calibracao e teste separados. A biblioteca de prototipos e construida apenas com calibracao; o teste externo nao define prototipos, nao escolhe K, nao altera o metodo e nao participa do roteamento por rotulos ou fidelidade.")]
     story += add_table(datasets_df, ["dataset", "task_type", "n_samples_total", "n_features", "n_classes", "n_repetitions", "class_distribution_total_json"], max_rows=20)
-    story += [P("A tabela descreve os cenarios efetivamente executados. Electrical Grid com stab reproduz o protocolo do artigo X-ELM; a versao sem stab funciona como controle contra proxy do alvo. Wine, Iris e Digits verificam classificacao multiclasse; Ionosphere e Breast Cancer Diagnostic ampliam dominio e dimensionalidade.")]
+    story += [P("A tabela descreve os cenarios efetivamente executados. Electrical Grid com stab reproduz o protocolo do artigo X-ELM; a versao sem stab funciona como controle contra proxy do alvo. Wine e Iris verificam classificacao multiclasse; Ionosphere e Breast Cancer Diagnostic ampliam dominio e dimensionalidade.")]
 
     story += [H("3. Desempenho preditivo do ELM no teste completo", 1)]
     article = data["predictive_performance_article_table"]
@@ -6380,7 +7220,22 @@ def _generate_pdf_report(experiment_root: Path, args: Optional[argparse.Namespac
         if not ds_cuda.empty:
             story += [P(f"A auditoria CUDA contem {len(ds_cuda)} registros para esta base; consulte a secao geral e o CSV para os desvios por seed.")]
 
-    story += [H("11. Limitacoes e limites de alegacao", 1)]
+    story += [H("11. Comparadores locais, globais e glocais da v70", 1)]
+    story += [P("A v70 preserva o nucleo matematico do NEX-ELM e acrescenta comparadores externos. No nivel local, a bateria inclui Kernel SHAP, LIME, Integrated Gradients e Gradient SHAP. No nivel global, inclui Kernel SHAP agregado, X-ELM, Permutation Importance e SAGE. No nivel glocal, inclui R-LOCO, com particoes aprendidas apenas na calibracao e roteamento do teste sem rotulos ou fidelidade.")]
+    story += [H("11.1 Comparacao local", 2)]
+    story += add_table(data["local_baseline_fidelity_summary"], ["dataset", "seed", "method", "metric", "top_k", "value_mean", "value_std", "class_flip_rate"], max_rows=80)
+    story += add_image(root / "combined" / "graficos_baselines" / "local_composite_auc.png", "AUC composta das explicacoes locais.")
+    story += [H("11.2 Comparacao global", 2)]
+    story += add_table(data["global_baseline_fidelity_summary"], ["dataset", "seed", "method", "metric", "top_k", "value_mean", "value_std", "class_flip_rate"], max_rows=80)
+    story += add_table(data["global_baseline_importance"], ["dataset", "seed", "feature", "nexelm_global", "kernel_shap_global", "xelm_global", "permutation_importance_global", "sage_global"], max_rows=45)
+    story += add_image(root / "combined" / "graficos_baselines" / "global_composite_auc.png", "AUC composta das explicacoes globais.")
+    story += [H("11.3 Comparacao glocal", 2)]
+    story += add_table(data["glocal_baseline_fidelity_summary"], ["dataset", "seed", "method", "metric", "top_k", "value_mean", "value_std", "class_flip_rate"], max_rows=80)
+    story += add_table(data["rloco_region_summary"], ["dataset", "seed", "region_id", "calibration_rows", "coverage", "within_importance_variance", "silhouette_global"], max_rows=45)
+    story += add_image(root / "combined" / "graficos_baselines" / "glocal_composite_auc.png", "AUC composta da comparacao glocal entre NEX-ELM e R-LOCO.")
+    story += [P("O R-LOCO usa modelos ELM auxiliares com uma covariavel removida por vez, calcula a perda de conformidade por observacao na calibracao e agrupa as representacoes no espaco de importancia. Cada linha de teste e roteada para o grupo que minimiza a soma das distancias euclidianas aos seus membros de calibracao, conforme a regra regional publicada. Esses modelos auxiliares nao substituem nem alteram o ELM usado pelo NEX-ELM.")]
+
+    story += [H("12. Limitacoes e limites de alegacao", 1)]
     story += [P("Os benchmarks nao representam todos os dominios, distribuicoes ou arquiteturas. As repeticoes medem variacao causada por divisao e inicializacao, mas nao substituem validacao em dados temporais, externos ou de producao. A fidelidade depende do jogo de referencia, do protocolo de insercao/delecao e da saida explicada.")]
     story += [P("Resultados do arquivo convergence.csv representam auditoria de completude para a configuracao executada quando existe apenas um numero de nos; nao constituem curva de convergencia. Exact Shapley em dados reais e nao aplicavel, devendo ser sustentado pelo diagnostico sintetico dedicado. Support recovery e aplicavel apenas quando existe suporte verdadeiro conhecido.")]
     findings = data["text_audit_findings"]
@@ -6389,7 +7244,7 @@ def _generate_pdf_report(experiment_root: Path, args: Optional[argparse.Namespac
     else:
         story += [P(f"A auditoria textual registrou {len(findings)} achados. A submissao deve aguardar a resolucao desses itens.", "Calloutx")]
 
-    story += [H("12. Conclusao", 1)]
+    story += [H("13. Conclusao", 1)]
     if total_primary:
         story += [P(f"O experimento confirmou {confirmed} de {total_primary} hipoteses primarias. A conclusao cientifica deve nomear as bases e comparacoes que passaram e as que permaneceram mistas, sem converter ausencia de significancia em equivalencia e sem ocultar resultados desfavoraveis.")]
     story += [P("O conjunto de resultados permite avaliar separadamente quatro dimensoes: capacidade preditiva do ELM, fidelidade das explicacoes, estabilidade entre seeds e custo computacional. A publicacao deve apresentar essas dimensoes como complementares, evitando usar boa acuracia como prova de explicabilidade ou boa concordancia com SHAP como prova de fidelidade.")]
@@ -6423,9 +7278,9 @@ def _run_report_only(args: argparse.Namespace) -> Path:
 def run_real(args: argparse.Namespace, runtime: Any, root: Path) -> List[Dict[str, pd.DataFrame]]:
     results: List[Dict[str, pd.DataFrame]] = []
     specs = _study_specs(args)
-    _write_v68_study_plan(root, args, specs)
+    _write_v70_study_plan(root, args, specs)
     for spec in specs:
-        bundles = [_load_v68_bundle(name, args) for name in spec["datasets"]]
+        bundles = [_load_v70_bundle(name, args) for name in spec["datasets"]]
         for bundle in bundles:
             context = _dataset_context(bundle, spec["phase"], spec["evidence_role"], spec["scenario"])
             _STUDY_CONTEXT[(str(bundle.name), str(spec["scenario"]))] = context
@@ -6436,7 +7291,7 @@ def run_real(args: argparse.Namespace, runtime: Any, root: Path) -> List[Dict[st
                     f"repetition={repetition}/{spec['repeats']} | seed={seed} | device={runtime.resolved}"
                 )
                 results.append(
-                    _evaluate_bundle_v68(
+                    _evaluate_bundle_v70(
                         bundle, args, runtime, root, int(seed), str(spec["scenario"]), False
                     )
                 )
@@ -6457,13 +7312,13 @@ def run_synthetic(args: argparse.Namespace, runtime: Any, root: Path) -> List[Di
             bundle = engine.make_synthetic_bundle(seed, kind, runtime, int(args.synthetic_samples))
             for internal_mode in internal_modes:
                 public_mode = public_names.get(str(internal_mode), str(internal_mode))
-                scenario = f"synthetic_{kind}_{public_mode}_v68_glopro_complete"
+                scenario = f"synthetic_{kind}_{public_mode}_v70_expanded_xai"
                 print(
                     f"[synthetic {METHOD_TITLE}] {scenario} | repetition={repetition + 1}/"
                     f"{args.synthetic_repetitions} | seed={seed} | device={runtime.resolved}"
                 )
                 results.append(
-                    _evaluate_bundle_v68(
+                    _evaluate_bundle_v70(
                         bundle, args, runtime, root, seed, scenario,
                         teacher_direct=(str(internal_mode) == "teacher"),
                     )
@@ -6502,7 +7357,7 @@ def _visible_source_for_audit(path: Path) -> str:
 
 def self_tests() -> Dict[str, Any]:
     base_tests = _ENGINE_SELF_TESTS()
-    obsolete_local_column = "local_core_frozen_from_" + "v" + str(35)
+    obsolete_local_column = "historical_local_core_frozen"
     sample = pd.DataFrame({
         "selected_candidate_probe": [1],
         "prototype_min_cluster_fixed": [999],
@@ -6542,7 +7397,7 @@ def self_tests() -> Dict[str, Any]:
     )
     source = _visible_source_for_audit(Path(__file__).resolve())
     forbidden_visible = re.findall(
-        r"(?<![A-Za-z0-9])v(?:2[0-9]|3[0-9]|4[0-9]|5[0-9]|6[0-7])(?:\.\d+)*(?=$|[^A-Za-z0-9])",
+        r"(?<![A-Za-z0-9])v(?!70(?:\D|$))\d+(?:\.\d+)*(?=$|[^A-Za-z0-9])",
         source,
         flags=re.I,
     )
@@ -6576,12 +7431,24 @@ def self_tests() -> Dict[str, Any]:
     )
     grid_alias_ok = _canonical_dataset_name("grid_no_stab") == "electrical_grid_stability_without_stab"
     complete_dataset_audit = (
-        len(COMPLETE_DATASETS) == 9
-        and len(set(COMPLETE_DATASETS)) == 9
+        len(COMPLETE_DATASETS) == 8
+        and len(set(COMPLETE_DATASETS)) == 8
         and set(EXTENDED_GENERALIZATION_DATASETS).issubset(set(COMPLETE_DATASETS))
     )
+    class _GradientProbe:
+        W_super_ = np.asarray([[1.0], [2.0]])
+        b_super_ = np.asarray([0.0])
+        beta_super_ = np.asarray([[-1.0, 1.0]])
+        def _activation_np(self, z): return np.asarray(z, dtype=float)
+        def _activation_derivative_np(self, z): return np.ones_like(z, dtype=float)
+    gradient_probe = _v70_probability_gradient_numpy(_GradientProbe(), np.asarray([[0.2, -0.1]]), np.asarray([1]))
+    expanded_gradient_audit = gradient_probe.shape == (1, 2) and np.all(np.isfinite(gradient_probe))
+    expanded_method_registry_audit = (
+        "R-LOCO" in EXPANDED_GLOCAL_METHODS and "SAGE" in EXPANDED_GLOBAL_METHODS
+        and "Integrated Gradients" in EXPANDED_LOCAL_METHODS
+    )
     try:
-        import reportlab  # noqa: F401
+        import reportlab
         reportlab_available = True
     except Exception:
         reportlab_available = False
@@ -6591,6 +7458,7 @@ def self_tests() -> Dict[str, Any]:
             and routing_equivalence and math_core_frozen and renamed_budget_ok
             and visible_source_clean and binomial_interval_ok and multiclass_loader_ok
             and seed_independence_ok and grid_alias_ok and complete_dataset_audit
+            and expanded_gradient_audit and expanded_method_registry_audit
             and reportlab_available
         ),
         "mathematical_core_tests": base_tests,
@@ -6607,6 +7475,9 @@ def self_tests() -> Dict[str, Any]:
         "grid_without_stab_alias_audit": bool(grid_alias_ok),
         "complete_default_dataset_audit": bool(complete_dataset_audit),
         "complete_default_dataset_count": len(COMPLETE_DATASETS),
+        "expanded_gradient_audit": bool(expanded_gradient_audit),
+        "expanded_method_registry_audit": bool(expanded_method_registry_audit),
+        "nex_mathematical_core_modified_for_baselines": False,
         "reportlab_available": bool(reportlab_available),
         "predictive_complete_outer_test_hook_installed": True,
         "prototype_count_fixed": PROTOTYPE_COUNT,
@@ -6634,7 +7505,7 @@ def _run_statistics_only(args: argparse.Namespace) -> Path:
     root = engine.ensure_dir(
         Path(args.statistics_output_dir).expanduser()
         if args.statistics_output_dir is not None
-        else Path(f"resultados_v68_reanalise_estatistica_{stamp}")
+        else Path(f"resultados_v70_reanalise_estatistica_{stamp}")
     )
     combined = engine.ensure_dir(root / "combined" / "tabelas")
     for name in ("seed_metrics.csv", "estatistica_entre_seeds.csv"):
@@ -6665,7 +7536,7 @@ def _run_statistics_only(args: argparse.Namespace) -> Path:
         "statistical_tables": sorted(outputs),
         "passed": True,
     }
-    engine.write_json(audit, root / "audit_reanalise_estatistica_v68.json")
+    engine.write_json(audit, root / "audit_reanalise_estatistica_v70.json")
     print(f"Statistical reanalysis completed. Results: {root.resolve()}")
     return root
 
@@ -6692,7 +7563,7 @@ def main() -> None:
         raise RuntimeError("The default complete experiment requires CUDA. Use --device cpu only for an explicit non-default audit.")
     _ENGINE_CONFIGURE_CUDA(runtime, args)
     stamp = time.strftime("%Y%m%d_%H%M%S")
-    root = engine.ensure_dir(args.output_dir or f"resultados_v68_glopro_complete_{stamp}")
+    root = engine.ensure_dir(args.output_dir or f"resultados_v70_expanded_xai_{stamp}")
     engine.write_csv(confirmatory_plan(args), root / "plano_confirmatorio.csv")
     protocol = {
         "version": VERSION,
@@ -6713,7 +7584,9 @@ def main() -> None:
         "deterministic_kmedoids_frozen": True,
         "prototype_routing_frozen": True,
         "prototype_count_fixed": PROTOTYPE_COUNT,
-        "primary_methods_global": ["NEX-ELM", "Kernel SHAP", "X-ELM"],
+        "primary_methods_local": list(EXPANDED_LOCAL_METHODS),
+        "primary_methods_global": list(EXPANDED_GLOBAL_METHODS),
+        "primary_methods_glocal": list(EXPANDED_GLOCAL_METHODS),
         "primary_comparison": "NEX-ELM GloPro-Complete versus capacity-matched Kernel SHAP prototype library",
         "frozen_components": {"local_irp_nex": True, "cuda_executor_and_audit": True},
         "supplementary_statistical_suite": STATISTICAL_SUITE,
