@@ -1,4 +1,4 @@
-# NEX-ELM v69
+# NEX-ELM
 
 Reproducible implementation of **Native Explainability for Extreme Learning Machines (NEX-ELM)**, a model-specific glocal explainability framework for ensembles of **Extreme Learning Machines (ELMs)**.
 
@@ -13,10 +13,10 @@ NEX-ELM combines:
 The main executable file is:
 
 ```text
-nexlm.py
+nex_elm.py
 ```
 
-Running the script without command-line arguments executes the complete CUDA study plan reported for v69:
+Running the script without command-line arguments executes the complete CUDA study plan reported in the associated manuscript:
 
 ```text
 8 source datasets
@@ -25,7 +25,7 @@ Running the script without command-line arguments executes the complete CUDA stu
 270 scenario-seed experimental runs
 ```
 
-The Electrical Grid Stability dataset is evaluated in two scenarios: one retaining `stab` and one excluding it. The default workflow produces predictive evaluations, local, global, and glocal explanation analyses, statistical tests, runtime measurements, CPU--CUDA numerical audits, consolidated tables, figures, and `relatorio.pdf`.
+The Electrical Grid Stability dataset is evaluated in two scenarios: one retaining `stab` and one excluding it. The default workflow produces predictive evaluations, local, global, and glocal explanation analyses, statistical tests, runtime measurements, CPU--CUDA numerical audits, consolidated tables, figures, and `nex_elm.pdf`.
 
 ---
 
@@ -59,25 +59,25 @@ The method addresses this problem by deriving native local attribution signature
 
 ### 2.1 Core Components
 
-1. **Predictive ELM ensemble**  
+1. **Predictive ELM ensemble**
    An ensemble of ELM estimators is fitted using uniform estimator weights. Each estimator contains a randomized hidden layer and obtains its output weights through Ridge-regularized linear optimization.
 
-2. **IRP-NEX local attribution**  
+2. **IRP-NEX local attribution**
    For each observation, IRP-NEX explains the probability assigned to the class predicted by the ensemble. The target class remains fixed throughout the perturbation trajectory, including cases in which a perturbed observation crosses a decision boundary.
 
-3. **Empirical interventional game**  
+3. **Empirical interventional game**
    Feature contributions are evaluated relative to an empirical background distribution. The solver searches for a complete feature-insertion order that reconstructs the model output associated with the fixed target class.
 
-4. **Registered-set explanation signature**  
+4. **Registered-set explanation signature**
    The complete feature order is converted into registered prefixes. Two explanations can then be compared through a distance defined over their registered prefix sets.
 
-5. **Class-conditional prototype library**  
+5. **Class-conditional prototype library**
    Explanation signatures computed exclusively from the calibration partition are grouped by ensemble-predicted class. Each class is represented by at most four medoids obtained through deterministic k-medoids clustering.
 
-6. **Glocal inference routing**  
+6. **Glocal inference routing**
    For an unseen observation, the ensemble-predicted class selects the relevant prototype library. The observation's IRP-NEX signature is routed to the nearest fixed medoid within that class.
 
-7. **Regional and global summaries**  
+7. **Regional and global summaries**
    The routed prototype provides the regional explanation. Weighted prototype collections are used to derive class-conditional and dataset-level analytical summaries.
 
 The final explanatory output contains:
@@ -240,9 +240,9 @@ The scikit-learn datasets are loaded from the installed library. Electrical Grid
 
 ---
 
-## 8. Reported v69 Results
+## 8. Reported Results
 
-The following statements summarize the completed 30-seed v69 experiment. They are descriptive of the evaluated scenarios and must not be interpreted as universal claims.
+The following statements summarize the completed 30-seed experiment. They are descriptive of the evaluated scenarios and must not be interpreted as universal claims.
 
 ### 8.1 Predictive Performance
 
@@ -315,8 +315,6 @@ The experiment supports functional stability, whereas exact signature repetition
 
 | Component | Effective configuration |
 |---|---|
-| Software version | `v69` |
-| Packaging revision | `v69-expanded-xai-benchmarks-frozen-v68-nex-core` |
 | Study plan | `complete` |
 | Data mode | `real` |
 | Source datasets | 8 |
@@ -370,7 +368,7 @@ The experiment supports functional stability, whereas exact signature repetition
 
 ### 9.3 Expanded-Baseline Controls
 
-The v69 wrapper exposes the following controls:
+The executable exposes the following controls:
 
 ```text
 --expanded-baselines {full,fast,off}
@@ -443,7 +441,7 @@ The implementation requires:
 - scikit-learn;
 - SHAP;
 - PyTorch;
-- ReportLab, when `relatorio.pdf` is required.
+- ReportLab, when `nex_elm.pdf` is required.
 
 A CUDA-capable NVIDIA GPU is required for the default `complete` study plan. A reduced custom audit can be executed on a CPU.
 
@@ -497,7 +495,7 @@ python -c "import torch, shap, sklearn, numpy, pandas, scipy; print('torch:', to
 
 ```text
 nex_elm_project/
-├── nexlm_v69_expanded_xai_benchmarks.py
+├── nex_elm.py
 ├── README.md
 ├── requirements.txt
 ├── requirements-lock.txt             # recommended for strict reproduction
@@ -508,7 +506,7 @@ nex_elm_project/
 The integrity-checked mathematical core is embedded in the main script. An adjacent file named:
 
 ```text
-nexlm_v68_glopro_complete_core.py
+nex_elm_core.py
 ```
 
 is optional and is loaded only when its SHA-256 digest matches:
@@ -517,7 +515,7 @@ is optional and is loaded only when its SHA-256 digest matches:
 fc78619795db892180c7b978366a67b15a48741103f0fcc98eeab7b7dcf2031f
 ```
 
-The v68 identifier in the optional core filename is intentional: v69 adds external local, global, and glocal baselines while retaining the frozen NEX-ELM mathematical core. A non-matching adjacent core is ignored.
+The adjacent core is optional. It is loaded only when its SHA-256 digest matches the expected integrity value; otherwise, the embedded integrity-checked core is used.
 
 ---
 
@@ -526,7 +524,7 @@ The v68 identifier in the optional core filename is intentional: v69 adds extern
 ### 12.1 Display Command-Line Help
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py --help
+python nex_elm.py --help
 ```
 
 ### 12.2 Reproduce the Complete Experiment
@@ -534,20 +532,20 @@ python nexlm_v69_expanded_xai_benchmarks.py --help
 Running without arguments selects CUDA, the RTX 3060 12 GB profile, 30 repetitions, all nine scenarios, expanded baselines, and PDF generation:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py
+python nex_elm.py
 ```
 
 Specify the output directory:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
-  --output-dir nex_elm_v69_results
+python nex_elm.py \
+  --output-dir nex_elm_results
 ```
 
 PowerShell:
 
 ```powershell
-python nexlm_v69_expanded_xai_benchmarks.py --output-dir nex_elm_v69_results
+python nex_elm.py --output-dir nex_elm_results
 ```
 
 > The default `complete` plan requires CUDA. The script raises an error when the complete plan resolves to a CPU device.
@@ -555,9 +553,9 @@ python nexlm_v69_expanded_xai_benchmarks.py --output-dir nex_elm_v69_results
 ### 12.3 Run a GPU Smoke Test
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --quick \
-  --output-dir nex_elm_v69_smoke_test
+  --output-dir nex_elm_smoke_test
 ```
 
 The `--quick` option reduces each phase to one repetition and reduces expanded-baseline workloads.
@@ -565,14 +563,14 @@ The `--quick` option reduces each phase to one repetition and reduces expanded-b
 ### 12.4 Run a Reduced CPU Audit
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --study-plan custom \
   --datasets iris \
   --n-repeats 1 \
   --device cpu \
   --expanded-baselines fast \
   --skip-pdf-report \
-  --output-dir nex_elm_v69_cpu_audit
+  --output-dir nex_elm_cpu_audit
 ```
 
 The alias `iris` resolves to `iris_multiclass`.
@@ -580,13 +578,13 @@ The alias `iris` resolves to `iris_multiclass`.
 ### 12.5 Run Selected Scenarios
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --study-plan custom \
   --datasets iris,wine,breast_diagnostic \
   --n-repeats 5 \
   --device cuda \
   --expanded-baselines full \
-  --output-dir nex_elm_v69_custom_results
+  --output-dir nex_elm_custom_results
 ```
 
 Accepted aliases include:
@@ -606,11 +604,11 @@ Accepted aliases include:
 ### 12.6 Run Only the Replication Phase
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --study-plan replication \
   --replication-repeats 30 \
   --replication-random-state 100000 \
-  --output-dir nex_elm_v69_replication_results
+  --output-dir nex_elm_replication_results
 ```
 
 The default replication phase includes:
@@ -622,19 +620,19 @@ The default replication phase includes:
 ### 12.7 Run Only the Generalization Phase
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --study-plan generalization \
   --generalization-repeats 30 \
   --generalization-random-state 100000 \
-  --output-dir nex_elm_v69_generalization_results
+  --output-dir nex_elm_generalization_results
 ```
 
 ### 12.8 Run the Journal Plan
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --study-plan journal \
-  --output-dir nex_elm_v69_journal_plan
+  --output-dir nex_elm_journal_plan
 ```
 
 The `journal` plan retains the preceding reduced scenario plan, whereas `complete` includes the complete nine-scenario benchmark.
@@ -644,27 +642,27 @@ The `journal` plan retains the preceding reduced scenario plan, whereas `complet
 Full benchmark:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py --expanded-baselines full
+python nex_elm.py --expanded-baselines full
 ```
 
 Reduced supplementary benchmark:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py --expanded-baselines fast
+python nex_elm.py --expanded-baselines fast
 ```
 
-Disable the supplementary v69 comparators while retaining the frozen core:
+Disable the supplementary comparators while retaining the frozen core:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py --expanded-baselines off
+python nex_elm.py --expanded-baselines off
 ```
 
 ### 12.10 Configure R-LOCO Regions
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --rloco-regions 4 \
-  --output-dir nex_elm_v69_rloco_k4
+  --output-dir nex_elm_rloco_k4
 ```
 
 Changing the number of R-LOCO regions does not alter NEX-ELM's frozen prototype count.
@@ -672,7 +670,7 @@ Changing the number of R-LOCO regions does not alter NEX-ELM's frozen prototype 
 ### 12.11 Use Local Dataset Files Without Downloading
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --data-dir reference_data \
   --no-download
 ```
@@ -690,9 +688,9 @@ reference_data/
 ### 12.12 Use the Conservative GPU Profile
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --gpu-profile conservative \
-  --output-dir nex_elm_v69_conservative_gpu_results
+  --output-dir nex_elm_conservative_gpu_results
 ```
 
 The GPU profile changes execution and batching parameters only. It does not change the frozen NEX-ELM mathematics.
@@ -700,9 +698,9 @@ The GPU profile changes execution and batching parameters only. It does not chan
 ### 12.13 Recompute Statistical Analyses Without Rerunning Models
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
-  --statistics-only-from nex_elm_v69_results \
-  --statistics-output-dir nex_elm_v69_statistical_reanalysis
+python nex_elm.py \
+  --statistics-only-from nex_elm_results \
+  --statistics-output-dir nex_elm_statistical_reanalysis
 ```
 
 The source directory must contain `seed_metrics.csv` and, when available, `estatistica_entre_seeds.csv`, either directly or under `combined/tabelas`.
@@ -710,15 +708,15 @@ The source directory must contain `seed_metrics.csv` and, when available, `estat
 ### 12.14 Regenerate Only the PDF Report
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
-  --report-only-from nex_elm_v69_results \
-  --report-output nex_elm_v69_report.pdf
+python nex_elm.py \
+  --report-only-from nex_elm_results \
+  --report-output nex_elm.pdf
 ```
 
 Skip PDF generation during a model run:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py --skip-pdf-report
+python nex_elm.py --skip-pdf-report
 ```
 
 ---
@@ -728,10 +726,10 @@ python nexlm_v69_expanded_xai_benchmarks.py --skip-pdf-report
 A standard run produces a structure similar to:
 
 ```text
-resultados_v69_expanded_xai_YYYYMMDD_HHMMSS/
+nex_elm_results/
 ├── plano_confirmatorio.csv
 ├── registro_protocolo_confirmatorio.json
-├── relatorio.pdf
+├── nex_elm.pdf
 ├── per_seed/
 │   └── <dataset>/<scenario>/seed_<value>/
 │       ├── manifest.json
@@ -773,9 +771,9 @@ Some generated filenames remain in Portuguese because they are part of the imple
 | `prototype_routing_summary.csv` | Routing summary |
 | `prototype_stability_between_seeds.csv` | Across-seed prototype diagnostics |
 
-### 13.3 Expanded v69 Baseline Outputs
+### 13.3 Expanded Baseline Outputs
 
-The v69 wrapper adds consolidated tables for:
+The executable adds consolidated tables for:
 
 - LIME local attributions and fidelity;
 - Integrated Gradients attributions, fidelity, and completeness;
@@ -826,8 +824,8 @@ Before the experimental workflow begins, the script:
 The NEX prototype configuration is frozen. These commands intentionally raise an error:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py --prototype-count 3
-python nexlm_v69_expanded_xai_benchmarks.py --prototype-min-calibration-rows-per-slot 4
+python nex_elm.py --prototype-count 3
+python nex_elm.py --prototype-min-calibration-rows-per-slot 4
 ```
 
 The accepted values are:
@@ -860,7 +858,7 @@ Install a PyTorch build compatible with the intended CPU or CUDA environment.
 Use a reduced custom CPU audit:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --study-plan custom \
   --datasets iris \
   --n-repeats 1 \
@@ -873,13 +871,13 @@ python nexlm_v69_expanded_xai_benchmarks.py \
 Start with the conservative profile:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py --gpu-profile conservative
+python nex_elm.py --gpu-profile conservative
 ```
 
 A custom profile may reduce the principal batch sizes:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py \
+python nex_elm.py \
   --gpu-profile custom \
   --gpu-batch-size 8192 \
   --estimator-batch-size 32 \
@@ -890,7 +888,7 @@ python nexlm_v69_expanded_xai_benchmarks.py \
 The supplementary baselines can also be reduced:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py --expanded-baselines fast
+python nex_elm.py --expanded-baselines fast
 ```
 
 ### Dataset File Not Found with `--no-download`
@@ -906,7 +904,7 @@ pip install reportlab
 Or skip report generation:
 
 ```bash
-python nexlm_v69_expanded_xai_benchmarks.py --skip-pdf-report
+python nex_elm.py --skip-pdf-report
 ```
 
 ### Statistical Reanalysis Cannot Find Source Tables
